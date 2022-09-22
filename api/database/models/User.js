@@ -1,47 +1,55 @@
 const Sequelize = require('sequelize');
+const usersController = require('../../controllers/usersController');
 module.exports = function(sequelize, DataTypes) {
-  const User = sequelize.define('User', {
-    id: {
+  const cols = {
+    id:{
+      type: DataTypes.INTEGER,
+      primaryKey: true,
       autoIncrement: true,
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true
+      allowNull: false
     },
-    email: {
+    email:{
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: "email"
+      unique: true
     },
-    username: {
+    username:{
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: "username"
+      unique: true
     },
-    password: {
+    password:{
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    first_name: {
+    first_name:{
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    last_name: {
+    last_name:{
       type: DataTypes.STRING(50),
       allowNull: false
     },
-    profilepic: {
+    profilepic:{
       type: DataTypes.STRING(255),
-      allowNull: true
-    },
-    id_role: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: false
     }
-  }, {
-    sequelize,
+  }
+
+  const extras = {
     tableName: 'users',
-    timestamps: false,
-  });
+    timestamps: false
+  }
+
+  const User = sequelize.define('User', cols, extras)
+   
+  User.associate = (models) => {
+
+    User.belongsTo(models.Role, {
+      as: 'userRole',
+      foreignKey: 'id_role'
+    })
+  }
 
   return User;
 };
