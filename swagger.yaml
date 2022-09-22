@@ -1,0 +1,1192 @@
+openapi: 3.0.0
+info:
+  title: Mi Ecommerce
+  version: 1.0.0
+  description: |-
+    Ecommerce Grupo 7.
+  
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Entorno Desarrollo
+    
+tags:
+  - name: login
+    description: Todos los endpoints de login
+  - name: usuarios
+    description: Todos los endpoints de usuarios
+  - name: productos
+    description: Todos los endpoints de productos
+  - name: pictures
+    description: Todos los endpoints de pictures
+  - name: carts
+    description: Todos los endpoints de carts
+
+paths:
+  /login:
+    post:
+      tags: 
+        - login
+      summary: Retorna el token del usuario logueado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: guest
+                password:
+                  type: string
+                  example: guest1234
+      responses:
+        '200':    # status code
+          description: Usuario logueado
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  usuario:
+                    type: object
+                    properties: 
+                      iduser:
+                        type: number
+                      username:
+                        type: string
+                  token:
+                    type: string
+        '400':
+          description: No se pudo loguear
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '500':
+          description: Error al intentar loguearse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+  /users:
+    get:
+      tags: 
+        - usuarios
+      summary: Lista todos los usuarios del sistema
+      security:
+        - bearerAuth: []
+      responses: 
+        '200':
+          description: Listado de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/usuario'
+    post:
+      tags:
+        - usuarios
+      summary: Creacion de un nuevo usuario
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usuarioconpass'
+      responses:
+        '200':
+          description: crea un usuario nuevo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  user:
+                    $ref: '#/components/schemas/usuario'
+        '412':
+          description: no se cumple con los requerimientos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '500':
+          description: error al creare un usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+
+  /users/login:
+    post:
+      tags: 
+        - usuarios
+      summary: Retorna el token del usuario logueado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: guest
+                password:
+                  type: string
+                  example: guest1234
+      responses:
+        '200':    # status code
+          description: Usuario logueado
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  usuario:
+                    type: object
+                    properties: 
+                      iduser:
+                        type: number
+                      username:
+                        type: string
+                  token:
+                    type: string
+        '400':
+          description: No se pudo loguear
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '500':
+          description: Error al intentar loguearse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+
+  /users/{userId}:
+    get:
+      tags:
+        - usuarios
+      summary: Lista los detalles de un usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: id del usuario a buscar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  users:
+                    $ref: '#/components/schemas/usuario'
+        '401':
+          description: no se encontro el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  users:
+                    $ref: '#/components/schemas/usuario'
+        '500':
+          description: error en el sistema
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+    put:
+      tags:
+        - usuarios
+      summary: Modifica un usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: id del usuario a modificar
+          required: true
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/usuarioconpass'
+                  
+      responses:
+        '200':
+          description: detalles del usuario modificado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  users:
+                    $ref: '#/components/schemas/usuario'
+        '404':
+          description: no se encontro al usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+    delete:
+      tags:
+        - usuarios
+      summary: Borra un usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          description: id del usuario a borrar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del usuario borrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+                  users:
+                    $ref: '#/components/schemas/usuario'
+        '404':
+          description: no se encontro al usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+  
+  /users/{id}/cart:
+    get:
+      tags:
+        - usuarios
+      summary: muestra el carrito del usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del usuario a buscar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del carrito del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: number
+                  cart:
+                    $ref: '#/components/schemas/cart'
+        '404':
+          description: no se encontro el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: no se pudo conectar a la base de datos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+    put:
+      tags:
+        - usuarios
+      summary: modifica un carrito
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cart'
+      parameters:
+        - name: id
+          in: path
+          description: id del usuario a buscar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Carrito modificado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  user:
+                    type: number
+                  cart:
+                    $ref: '#/components/schemas/cart'
+        '400':
+          description: dato erroneo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '404':
+          description: usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+  /carts/{id}:
+    get:
+      tags:
+        - carts
+      summary: muestra el carrito del usuario
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del usuario a buscar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del carrito del usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: number
+                  cart:
+                    $ref: '#/components/schemas/cart'
+        '404':
+          description: no se encontro el usuario
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: no se pudo conectar a la base de datos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+    put:
+      tags:
+        - carts
+      summary: modifica un carrito
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cart'
+      parameters:
+        - name: id
+          in: path
+          description: id del usuario a buscar
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Carrito modificado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                  user:
+                    type: number
+                  cart:
+                    $ref: '#/components/schemas/cart'
+        '400':
+          description: dato erroneo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  msg:
+                    type: string
+        '404':
+          description: usuario no encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+  
+  /pictures:
+    get:
+      tags:
+        - pictures
+      summary: muestra 
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: product
+          in: query
+          description: id del producto
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: devuelve las pictures del producto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gallery'
+        '400':
+          description: no se hizo la peticion de forma correcta
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: no se encontro el producto
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+    post:
+      tags: 
+        - pictures
+      summary: Crea una nueva picture
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                url:
+                  type: string
+                descripcion:
+                  type: string
+      responses:
+        '200':
+          description: crea una nueva picture
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  url:
+                    type: string
+                  descripcion:
+                    type: string
+        '400':
+          description: no se ingreso los datos correctamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+  
+  /pictures/{id}:
+    get:
+      tags:
+        - pictures
+      summary: devuelve una picture
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id de la picture
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: devuelve la picture
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  url:
+                    type: string
+                  descripcion:
+                    type: string
+        '400':
+          description: no se ingresaron los datos correctamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: no se encontro la picture
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+    put:
+      tags:
+        - pictures
+      summary: modifica un carrito
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id de la picture
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: devuelve la picture
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  url:
+                    type: string
+                  descripcion:
+                    type: string
+        '400':
+          description: no se ingresaron los datos correctamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: no se encontro la picture
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+    delete:
+      tags:
+        - pictures
+      summary: modifica un carrito
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id de la picture
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: devuelve la picture
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  url:
+                    type: string
+                  descripcion:
+                    type: string
+        '400':
+          description: no se ingresaron los datos correctamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: no se encontro la picture
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /products/{id}/pictures:
+    get:
+      tags:
+        - productos
+      summary: devuelve la galeria de pictures del producto
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del producto
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: devuelve la galeria de pictures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/gallery'
+        '400':
+          description: no se ingresaron los datos correctamente
+          content:
+            application/json:
+              schema:
+                type: string
+        '404':
+          description: no se encontro el producto
+          content:
+            application/json:
+              schema:
+                type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: string
+  /products:
+    get:
+      tags:
+        - productos
+      summary: devuelve la lista de productos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: query
+          description: recibe la categoria de producto a listar
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: se listo todos los productos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/product'
+        '404':
+          description: no se encontro la categoria
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    post:
+      tags:
+        - productos
+      summary: crear nuevo producto
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/product'  
+              required:
+                - title
+                - price
+      responses:
+        '200':
+          description: devuelve el producto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        
+  /products/{id}:
+    get:
+      tags:
+        - productos
+      summary: Devuelve la infomracion de un producto especifico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del producto
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del producto por id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        '404':
+          description: no se encontro el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    put:
+      tags:
+        - productos
+      summary: modifica la infomracion de un producto especifico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del producto
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: modificacion del producto por id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        '404':
+          description: no se encontro el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string  
+    delete:
+      tags:
+        - productos
+      summary: elimina un producto especifico
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id del producto
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: detalles del producto eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/product'
+        '404':
+          description: no se encontro el producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /products/search:
+    get:
+      tags:
+        - productos
+      summary: Devuelve la lista de productos que contienen la keyword
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          description: keyword
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: devuelve la lista de productos que contengan la keyword
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/product'
+        '404':
+          description: no se encontro producto que contengan la keyword
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /products/mostwanted:
+    get:
+      tags:
+        - productos
+      summary: Devuelve la lista de productos mas buscados
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: devuelve la lista de productos mas buscados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/product'
+        '500':
+          description: error interno
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    product:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        price:
+          type: number
+        description:
+          type: string
+        imagen:
+          type: string
+        gallery:
+          $ref: '#/components/schemas/gallery'
+        category:
+          type: string
+        mostwanted:
+          type: boolean
+        stock:
+          type: number
+    gallery:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: number
+          url:
+            type: string
+          description:
+            type: string
+    cart:
+      type: array
+      items:
+        type: object
+        properties:
+          product:
+            type: number
+          quantity:
+            type: number
+    usuario:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        username:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        profilepic:
+          type: string
+        role:
+          type: string
+        cart:
+          $ref: '#/components/schemas/cart'
+    usuarioconpass:
+      type: object
+      properties:
+        id:
+          type: number
+        email:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        profilepic:
+          type: string
+        role:
+          type: string
+        cart:
+          $ref: '#/components/schemas/cart'
