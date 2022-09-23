@@ -33,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
 
     //Relacion Usuario con Producto
     Product.belongsToMany(models.User,{
-      as: 'productousuario',
+      as: 'cart',
       through: 'Cart',
       foreignKey: 'id_product',
       otherKey: 'id_usuario'
