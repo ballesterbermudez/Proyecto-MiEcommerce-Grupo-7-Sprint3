@@ -66,7 +66,7 @@ const controller = {
 
         } ,
             //crea un producto: requiere titulo y precio a travez de un middleware
-     create: (req,resp) =>{
+     create: async (req,resp) =>{
 
             let product = req.product;
 
