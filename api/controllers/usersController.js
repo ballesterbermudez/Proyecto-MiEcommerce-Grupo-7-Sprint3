@@ -22,7 +22,7 @@ const roles = ["GUEST", "ADMIN", "GOD"];
 const usersController = {
   listUsers: async (req, res) => {
     try {
-      const users = await persistence.searchAll('User');
+      const users = await persistance.searchAll('User');
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
         ok: true,
