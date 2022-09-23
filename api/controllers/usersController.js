@@ -1,6 +1,4 @@
-const persistence = require('../persistence/persistence');
-
-
+const persistance = require("../persistence/persistence");
 
 const userConverter = (user) => {
   if (user) {
@@ -26,8 +24,8 @@ const roles = ["GUEST", "ADMIN", "GOD"];
 const usersController = {
   listUsers: async (req, res) => {
     try {
-      console.log( persistence ) 
-      const users = await persistence.searchAll('User');
+      console.log( persistance ) 
+      const users = await persistance.searchAll('User');
 console.log(users);
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
