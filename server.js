@@ -27,8 +27,7 @@ app.get("/test", async (req, res) => {
     const users = await db.User.findAll({
       include: [
         {
-          model: db.Product,
-          as: "cart",
+          association: 'cart',
           through: { attributes: ["quantity"] },
           attributes: ["title"],
         
