@@ -5,7 +5,7 @@ const db = require('../database/models')
 
 const persistence = {
   
-    searchBYUsername: async (username, password) => {
+  searchBYUsername: async (username, password) => {
 
       try{
           const user = await db.User.findOne({
