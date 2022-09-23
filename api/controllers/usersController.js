@@ -1,5 +1,4 @@
 const persistence = require('../persistence/persistence');
-const db = require('../database/models');
 
 
 
@@ -27,8 +26,9 @@ const roles = ["GUEST", "ADMIN", "GOD"];
 const usersController = {
   listUsers: async (req, res) => {
     try {
-      //const users = persistence.readDB("users.json");
-      const users = await User.findAll();
+      console.log( persistence ) 
+      const users = await persistence.searchAll('User');
+console.log(users);
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
         ok: true,
