@@ -34,30 +34,24 @@ module.exports = function(sequelize, DataTypes) {
   const Product = sequelize.define(alias, cols, extras);
   
   Product.associate = (models) => {
+    //Relacion Categoria con Producto
     Product.belongsTo(models.Category, {
       as: 'category_product',
-      foreingKey: 'id_category'
+      foreignKey: 'id_category'
     }),
-    Product.belongsToMany(models.Cart, {
-      as: 'cartProduct',
-      through: 'carts',
-      foreingKey: 'product_id',
-      other: 'user_id'
-    })
+      //Relacion Usuario con Producto
+      Product.belongsToMany(models.User,{
+        as: 'cart',
+        through: 'Cart',
+        foreignKey: 'id_product',
+        otherKey: 'id_usuario'
+      }),
+      //Relacion Producto con picture
+      Product.hasMany(models.Picture, {
+        as: "galery",
+        foreignKey: "id_product"
+      })
 
-
-  Product.associate = (models) => {
-
-    //Relacion Usuario con Producto
-    Product.belongsToMany(models.User,{
-      as: 'cart',
-      through: 'Cart',
-      foreignKey: 'id_product',
-      otherKey: 'id_usuario'
-    })
-
-  }
-
-  return Product;
 }
+return Product;
 }

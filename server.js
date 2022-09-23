@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const routeCarts = require("./api/routes/routeCarts");
@@ -24,18 +25,20 @@ app.get("/api/v1", (req, res) => {
 app.get("/test", async (req, res) => {
   try {
     console.log("ENTRE SL ENDPOINT");
-    const users = await db.User.findAll({
-      include: [
-        {
-          model: db.Product,
-          as: "cart",
-          through: { attributes: ["quantity"] },
-          attributes: ["title"],
+    // const users = await db.User.findAll({
+    //   include: [
+    //     {
+    //       model: db.Product,
+    //       as: "cart",
+    //       through: { attributes: ["quantity"] },
+    //       attributes: ["title"],
         
-        },
-      ],
-    });
-    res.send(users);
+    //     },
+    //   ],
+    // });
+
+    const categori = await db.Product.findByPk(1,{include: ["category_product", "galery"]})
+    res.send(categori);
   } catch (error) {
     console.log(error);
     console.log("ENTRE EN EL CATCH");
@@ -57,11 +60,12 @@ app.use("/api/v1/carts", verifyJWT, routeCarts);
 // Server open
 
 app.listen(process.env.PORT, async () => {
+  
   try {
     await db.sequelize.authenticate();
     console.log("Connection has been established successfully.");
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error("Unable to connect to the database:", error.message);
   }
   console.log("Se abrio correctamente en el puerto " + process.env.PORT);
 });
