@@ -116,8 +116,7 @@ const persistence = {
             
           }
           
-     
-      });
+    });
 
       return respuesta
   
@@ -148,8 +147,27 @@ const persistence = {
       throw new Error("Error acceso a bd")
     }
 
-  }
+  },
 
+  //Obtener fotos de un producto
+
+  searchPictureByProduct: async (id) => {
+
+    try {
+
+      const respuesta = await db.Product.findByPk(id, {
+        include: {
+          association: 'galery'
+        },
+        attributes: {exclude: ['id','title', 'price', 'description', 'id_category']}
+      });
+      return respuesta
+  
+    } catch (error) {
+
+      throw "Error acceso a bd"
+    }
+  },
 
 }
  
