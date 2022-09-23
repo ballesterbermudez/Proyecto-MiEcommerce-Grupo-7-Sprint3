@@ -109,19 +109,38 @@ const persistence = {
           [db.Sequelize.Op.or]: [
             { description: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
             {title: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
-             db.Sequelize.or(db.Sequelize.col('category_product.title'),  'lacteos') 
+            db.Sequelize.or(db.Sequelize.col('category_product.title'),  'lacteos') 
             ],
             
           }
           
-     
-      });
+    });
 
       return respuesta
   
     } catch (error) {
 
       throw new Error("Error acceso a bd")
+    }
+  },
+
+  //Obtener fotos de un producto
+
+  searchPictureByProduct: async (id) => {
+
+    try {
+
+      const respuesta = await db.Product.findByPk(id, {
+        include: {
+          association: 'galery'
+        },
+        attributes: {exclude: ['id','title', 'price', 'description', 'id_category']}
+      });
+      return respuesta
+  
+    } catch (error) {
+
+      throw "Error acceso a bd"
     }
   },
 
