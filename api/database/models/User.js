@@ -53,7 +53,7 @@ module.exports = function(sequelize, DataTypes) {
 
     //Relacion Usuario con Producto
     User.belongsToMany(models.Product,{
-      as: 'usuarioproducto',
+      as: 'cart',
       through: 'Cart',
       foreignKey: 'id_usuario',
       otherKey: 'id_product'
