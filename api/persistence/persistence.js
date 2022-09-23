@@ -1,54 +1,132 @@
-const fs = require('fs')
-const path = require('path');
+const { Op } = require('sequelize');
+const db = require('../database/models')
+
 
 
 const persistence = {
-    readDB:  (dataFile) => {
-        
-        const userDirectory = path.resolve(__dirname, "..", "data", dataFile);
-        
-        return JSON.parse(fs.readFileSync(userDirectory, "utf-8"));
-      },
-      
-    findByIdDB : (dataFile, id) => {
-        const userDirectory = path.resolve(__dirname, "..", "data", dataFile);
-        
-        const data = JSON.parse(fs.readFileSync(userDirectory, "utf-8"));
-        return data.find((ele) => ele.id == id);
-      },
-    
-    writeDB : (dataFile, arr) => {
-        const userDirectory = path.resolve(__dirname, "..", "data", dataFile);
-        fs.writeFileSync(userDirectory, JSON.stringify(arr));
-      },
+  
+    searchBYUsername: async (username, password) => {
 
-      //Prerrequisito el debe existir en el datafile
-    updateDB: (datafile, el) => {
-
-        
-        let data = persistence.readDB(datafile)
-
-        let newData = data.map(element => {
-            let aux;
-            if (element.id == el.id) {
-               aux = el;
-            } else {
-               aux = element;
-            }
-            return aux;})
-        
-            persistence.writeDB(datafile,newData);
+      try{
+          const user = await db.User.findOne({
+                           attributes:['id','username'], 
+                           where: {username: username, password: password}, 
+                           include: { 
+                           association: "userrole",
+                           attributes: ["role"] }  
+                          })
+          return user;
+      }catch (error)
+      {
+         throw "Error acceso de bd"
+      }
 
     },
-    
-    removeFromDB: (datafile, id) =>{
 
-        let data = persistence.readDB(datafile);
-        let newData = data.filter(el => el.id != id)
-        persistence.writeDB(datafile,newData);
+    searchAll: async (modelName) => {
+        try{
+          const info = await db[modelName].findAll();
+          return info
+        }catch(error){throw "Error acceso a bd"}
+
+    },
+
+    searchById : async (modelName, id) => {
+      try{
+        const info = await db[modelName].findByPk(id);
+        return info
+      }catch(error){throw "Error acceso a bd"}
+
+  },
+
+  updateData: async (modelName, id, datos) => {
+
+    try {
+
+         await  db[modelName].update(
+            datos,
+          {
+            where: {id: id}
+          })
+
+
+    } catch (error) {
+      throw "Error acceso a bd"
     }
 
+  },
+
+  delete: async (modelName, id) => {
+
+   try {
     
+       await db[modelName].destroy({where: {id: id}})
+
+    } catch (error) {
+     throw "Error acceso a bd"
+    }
+  },
+
+  inster: async (modelName, datos) => {
+
+    try {
+      
+      await db[modelName].create(datos);
+
+    } catch (error) {
+      throw "Error acceso a bd"
+    }
+
+  },
+
+
+  //Criteria es un objeto con las propiedades dentro del findAll
+
+  searchByCriteria: async (modelName, criteria) => {
+
+    try {
+
+      const respuesta = await db[modelName].findAll(criteria);
+      return respuesta
+  
+    } catch (error) {
+
+      throw "Error acceso a bd"
+    }
+  },
+
+  searchByKeyword: async  (keyWord) => {
+
+    try {
+      db.Sequelize.or
+      const respuesta = await db.Product.findAll({
+        
+        include: {
+            association: 'category_product',
+            attributes: ["title"]
+            },
+        where: {
+          [db.Sequelize.Op.or]: [
+            { description: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
+            {title: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
+             db.Sequelize.or(db.Sequelize.col('category_product.title'),  'lacteos') 
+            ],
+            
+          }
+          
+     
+      });
+
+      return respuesta
+  
+    } catch (error) {
+
+      throw new Error("Error acceso a bd")
+    }
+  },
+
 }
+ 
+
 
 module.exports = persistence;
