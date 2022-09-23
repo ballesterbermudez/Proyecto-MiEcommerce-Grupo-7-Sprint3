@@ -45,9 +45,18 @@ module.exports = function(sequelize, DataTypes) {
    
   User.associate = (models) => {
 
+    //Relacion Usuario con Rol
     User.belongsTo(models.Role, {
-      as: 'userRole',
+      as: 'userrole',
       foreignKey: 'id_role'
+    })
+
+    //Relacion Usuario con Producto
+    User.belongsToMany(models.Product,{
+      as: 'usuarioproducto',
+      through: 'Cart',
+      foreignKey: 'id_usuario',
+      otherKey: 'id_product'
     })
   }
 

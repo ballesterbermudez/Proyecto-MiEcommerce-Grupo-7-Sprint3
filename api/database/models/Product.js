@@ -29,6 +29,16 @@ module.exports = function(sequelize, DataTypes) {
     timestamps: false,
   });
 
+  Product.associate = (models) => {
+
+    //Relacion Usuario con Producto
+    Product.belongsToMany(models.User,{
+      as: 'productousuario',
+      through: 'Cart',
+      foreignKey: 'id_product',
+      otherKey: 'id_usuario'
+    })
+  }
 
   return Product;
 };

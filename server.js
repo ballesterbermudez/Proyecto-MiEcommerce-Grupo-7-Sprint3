@@ -9,7 +9,8 @@ const verifyJWT = require('./api/middelware/verifyJWT');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
 const swaggerDocument = YAML.load('./swagger.yaml');
-const db = require('./api/database/models')
+const db = require('./api/database/models');
+const { Model } = require("sequelize");
 require("dotenv").config();
 
 app.use(express.json());
@@ -19,6 +20,22 @@ app.use(express.json());
 app.get("/api/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
+
+app.get('/test', async (req, res) => {
+  try {
+    console.log('ENTRE SL ENDPOINT');
+    const users = await db.User.findAll({      
+      include: [
+        'usuarioproducto'
+      ]
+    })
+    res.send(users)
+  } catch (error) {
+    console.log(error);
+    console.log('ENTRE EN EL CATCH');
+    
+  }
+})
 
 // Swagger - Documentacion api
 
