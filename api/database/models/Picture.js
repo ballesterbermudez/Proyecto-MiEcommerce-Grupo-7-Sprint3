@@ -16,16 +16,20 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(100),
       allowNull: true
     },
-    id_product: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    }
+    
   }, {
     sequelize,
     tableName: 'pictures',
     timestamps: false,
   });
   
-
+  Picture.associate = (models) => {
+    //Relacion Categoria con Producto
+    Picture.belongsTo(models.Product, {
+      as: 'galery',
+      foreignKey: 'id_product'
+    })
+  }
+  
   return Picture
 };
