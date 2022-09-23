@@ -15,14 +15,14 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    date: {
-      type: DataTypes.DATE,
-      allowNull: false
-    }
+    
   }, {
     sequelize,
     tableName: 'carts',
-    timestamps: false,
+    timestamps: true,
+    createdAt: false,
+    updatedAt: 'date'
+
   });
   
  
