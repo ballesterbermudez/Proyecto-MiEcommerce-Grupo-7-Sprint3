@@ -25,20 +25,20 @@ app.get("/api/v1", (req, res) => {
 app.get("/test", async (req, res) => {
   try {
     console.log("ENTRE SL ENDPOINT");
-    // const users = await db.User.findAll({
-    //   include: [
-    //     {
-    //       model: db.Product,
-    //       as: "cart",
-    //       through: { attributes: ["quantity"] },
-    //       attributes: ["title"],
+    const users = await db.User.findAll({
+      include: [
+        {
+          model: db.Product,
+          as: "cart",
+          through: { attributes: ["quantity"] },
+          attributes: ["title"],
         
-    //     },
-    //   ],
-    // });
+        },
+      ],
+    });
 
     const categori = await db.Product.findByPk(1,{include: ["category_product", "galery"]})
-    res.send(categori);
+    res.send(users);
   } catch (error) {
     console.log(error);
     console.log("ENTRE EN EL CATCH");
