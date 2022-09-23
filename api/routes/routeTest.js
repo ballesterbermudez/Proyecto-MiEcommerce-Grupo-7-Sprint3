@@ -87,6 +87,9 @@ try {
   resp.send(error)
   
 }
+
+})
+
 router.get('/pictures', async (req,resp)=> {
 
   try {
