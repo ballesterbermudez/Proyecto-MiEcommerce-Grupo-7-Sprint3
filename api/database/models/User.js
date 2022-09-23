@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const usersController = require('../../controllers/usersController');
+
 module.exports = function(sequelize, DataTypes) {
   const cols = {
     id:{

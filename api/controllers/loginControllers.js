@@ -1,23 +1,18 @@
-
 const generateJWT = require("../../helpers/generateToken");
-const persistance = require('../persistence/persistence')
+const persistance = require("../persistence/persistence");
 
 const login = async (req, res) => {
-
   const { username, password } = req.body;
-  const data = persistance.readDB("users.json");
-
   try {
 
-    const user = data.find(
-      (user) => user.username == username && user.password == password
-    );
+    const user = await persistance.searchBYUsername(username, password);
+   
+    if (user != null) {
 
-    if (user != undefined) {
       const payload = {
         id: user.id,
         username: user.username,
-        role: user.role,
+        role: user.userrole.role,
       };
 
       res.status(200).json({
@@ -29,7 +24,6 @@ const login = async (req, res) => {
         },
         token: await generateJWT(payload),
       });
-      
     } else {
       res.status(400).json({
         ok: false,
@@ -45,4 +39,4 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = {login}
+module.exports = { login };
