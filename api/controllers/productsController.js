@@ -2,6 +2,7 @@
 const path = require('path');
 const picture = require('./pictureController')
 const persistence = require('../persistence/persistence');
+const modelName = "Product"
 
 
 const directory = path.resolve(__dirname,"..","data",)
@@ -9,29 +10,28 @@ const directory = path.resolve(__dirname,"..","data",)
 const controller = {
 
         //retorna la lista de los productos
-    list: (req,resp) => {
+    list: async (req,resp) => {
 
          try{
             
            
-            const data = persistence.readDB("products.json")
             const category = req.query.category;
+            
 
             if(category)
             {
-                const info = data.filter(el => el.category == category)
-                if(info.length > 0)
-                {
-                    resp.status(200).json(info);
-                }
-                else
-                {
-                    resp.status(404).json({message: "no se encontro ningun producto con esa categoria"});
-                }
-               
+                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category}}
+                const data = await persistence.searchByCriteria("Category",criteria);
+                
+                resp.status(200).json(data);
+                
             }
             else
             {
+
+                const criteria = {include: {association: 'category_product', attributes: ["title"]}}
+                const data = await persistence.searchByCriteria(modelName,criteria)
+
                 resp.status(200).json(data);
             }
 
@@ -43,14 +43,15 @@ const controller = {
         },
     
         //retorna los detalles de un producto
-    details: (req,resp) =>{
+    details: async (req,resp) =>{
 
         try{
 
             
-            const prod = persistence.findByIdDB("products.json", req.params.id)
+            const prod = await persistence.searchById(modelName,req.params.id)
+            
 
-            if(prod)
+            if(prod != null)
             {
                 resp.status(200).json(prod);
             }
@@ -71,27 +72,10 @@ const controller = {
 
             try{
                 
-                
-                const data = persistence.readDB("products.json")
-                const id = data[data.length - 1].id + 1;
-                
-                if(product.gallery.length > 0)
-                {
-                    
-                     const newGallery = product.gallery.map(el=> {let pic = picture.getPicture(el);
-                        
-                        return pic;
-                    });
-                    product.gallery = newGallery;
-                }
-               
-                let newProduct = {id, ...product}
+                 await persistence.inster(modelName,product);
+                 const newProd = await persistence.searchByCriteria(modelName, {where: {title: product.title}})
 
-                data.push(newProduct);
-
-                persistence.writeDB("products.json", data);
-
-                resp.status(200).json(newProduct);
+                resp.status(200).json(newProd);
 
 
             }catch(error){
@@ -253,7 +237,7 @@ const controller = {
                 }
                 else
                 {
-                    req.product = {title,price,description,image,gallery,category, mostwanted, stock} 
+                    req.product = {title,price,description,category,mostwanted,stock} 
                     next();
                 }
             }

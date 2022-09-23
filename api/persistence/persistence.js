@@ -67,6 +67,8 @@ const persistence = {
     }
   },
 
+  
+
   inster: async (modelName, datos) => {
 
     try {
@@ -109,19 +111,61 @@ const persistence = {
           [db.Sequelize.Op.or]: [
             { description: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
             {title: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
-             db.Sequelize.or(db.Sequelize.col('category_product.title'),  'lacteos') 
+             db.Sequelize.where(db.Sequelize.col('category_product.title'), {[db.Sequelize.Op.like] : "%"+keyWord+"%"}) 
             ],
             
           }
           
-     
-      });
+    });
 
       return respuesta
   
     } catch (error) {
 
       throw new Error("Error acceso a bd")
+    }
+  },
+
+  getCartByUserID: async (id) => {
+
+    try{
+      const cart =  await db.User.findByPk(id, {
+        include: {
+          model: db.Product,
+          as: "cart",
+          through: { attributes: ["quantity", "date"] },
+          attributes: ["title"],
+        },
+        //attributes: [db.Sequelize.col('cart')]
+        attributes: {exclude: ["email", "password", "username", "first_name", "last_name", "profilepic", "id_role"]}
+
+      })
+
+      return cart;
+
+    }catch(Error){
+      throw new Error("Error acceso a bd")
+    }
+
+  },
+
+  //Obtener fotos de un producto
+
+  searchPictureByProduct: async (id) => {
+
+    try {
+
+      const respuesta = await db.Product.findByPk(id, {
+        include: {
+          association: 'galery'
+        },
+        attributes: {exclude: ['id','title', 'price', 'description', 'id_category']}
+      });
+      return respuesta
+  
+    } catch (error) {
+
+      throw "Error acceso a bd"
     }
   },
 

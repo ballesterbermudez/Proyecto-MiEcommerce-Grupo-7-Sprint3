@@ -15,9 +15,9 @@ Toda la documentacion fue hecha con Swagger y se puede ver abriendo el archivo `
 
 Para instalar y poder usar este proyecto usted debe seguir los siguientes pasos:
 
-1. ` $  git clone https://github.com/ballesterbermudez/Proyecto-MiEcommerce-Grupo-7 `
+1. ` $  git clone https://github.com/ballesterbermudez/Proyecto-MiEcommerce-Grupo-7-Sprint2`
 
-2. ` npm install`
+2. ` $ npm install`
 
 3. `Configurar las variables de entorno correctamente para poder correrlo en su maquina`
 
