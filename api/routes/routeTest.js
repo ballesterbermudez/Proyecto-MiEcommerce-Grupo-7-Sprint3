@@ -76,4 +76,18 @@ router.get('/keyword', async (req,resp)=> {
 
 })
 
+router.get('/cart', async (req,resp) => {
+
+try {
+
+  const result = await persistence.getCartByUserID(4);
+
+  resp.send(result);
+} catch (error) {
+  resp.send(error)
+  
+}
+
+})
+
 module.exports = router
