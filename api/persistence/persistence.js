@@ -70,6 +70,14 @@ const persistence = {
     }
   },
 
+  deleteCartByUserId: async (userId) => {
+    try{
+        await db.Cart.destroy({where: {id_user: userId}})
+    }catch (error){
+      throw 'Error acceso a bd'
+    }
+  },
+
   
 
   inster: async (modelName, datos) => {
