@@ -159,11 +159,9 @@ const persistence = {
     try {
       const respuesta = await db.Product.findByPk(id, {
         include: {
-          association: "galery",
+          association: 'galery'
         },
-        attributes: {
-          exclude: ["id", "title", "price", "description", "id_category"],
-        },
+        attributes: [],
       });
       return respuesta;
     } catch (error) {
