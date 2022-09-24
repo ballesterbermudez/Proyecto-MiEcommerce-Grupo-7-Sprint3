@@ -18,7 +18,7 @@ const persistence = {
           return user;
       }catch (error)
       {
-         throw "Error acceso de bd"
+         throw error
       }
 
     },
@@ -27,7 +27,7 @@ const persistence = {
         try{
           const info = await db[modelName].findAll();
           return info
-        }catch(error){throw "Error acceso a bd"}
+        }catch(error){throw error}
 
     },
 
@@ -53,7 +53,7 @@ const persistence = {
     } catch (error) {
       
       
-      throw new Error(error)
+      throw error
     }
 
   },
@@ -66,7 +66,7 @@ const persistence = {
 
     } catch (error) {
       
-     throw "Error acceso a bd"
+     throw error
     }
   },
 
@@ -80,7 +80,7 @@ const persistence = {
       return newData
 
     } catch (error) {
-      throw new Error(error)
+      throw error
     }
 
   },
@@ -97,7 +97,7 @@ const persistence = {
   
     } catch (error) {
 
-      throw "Error acceso a bd"
+      throw error
     }
   },
 
@@ -126,7 +126,7 @@ const persistence = {
   
     } catch (error) {
 
-      throw new Error("Error acceso a bd")
+      throw error
     }
   },
 
@@ -148,7 +148,7 @@ const persistence = {
       return cart;
 
     }catch(Error){
-      throw new Error("Error acceso a bd")
+      throw Error
     }
 
   },
@@ -169,7 +169,7 @@ const persistence = {
   
     } catch (error) {
 
-      throw "Error acceso a bd"
+      throw error
     }
   },
 
