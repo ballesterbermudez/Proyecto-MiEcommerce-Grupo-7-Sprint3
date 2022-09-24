@@ -38,39 +38,39 @@ const persistence = {
 
   },
 
-  searchAll: async (modelName) => {
-    try {
-      const user = await db.User.findOne({
-        attributes: ["id", "username"],
-        where: { username: username, password: password },
-        include: {
-          association: "userrole",
-          attributes: ["role"],
-        },
-      });
-      return user;
-    } catch (error) {
-      throw "Error acceso de bd";
-    }
-  },
+  // searchAll: async (modelName) => {
+  //   try {
+  //     const user = await db.User.findOne({
+  //       attributes: ["id", "username"],
+  //       where: { username: username, password: password },
+  //       include: {
+  //         association: "userrole",
+  //         attributes: ["role"],
+  //       },
+  //     });
+  //     return user;
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // },
 
-  searchAll: async (modelName) => {
-    try {
-      const info = await db[modelName].findAll();
-      return info;
-    } catch (error) {
-      throw "Error acceso a bd";
-    }
-  },
+  // searchAll: async (modelName) => {
+  //   try {
+  //     const info = await db[modelName].findAll();
+  //     return info;
+  //   } catch (error) {
+  //     throw "Error acceso a bd";
+  //   }
+  // },
 
-  searchById: async (modelName, id) => {
-    try {
-      const info = await db[modelName].findByPk(id);
-      return info;
-    } catch (error) {
-      throw new Error(error);
-    }
-  },
+  // searchById: async (modelName, id) => {
+  //   try {
+  //     const info = await db[modelName].findByPk(id);
+  //     return info;
+  //   } catch (error) {
+  //     throw new Error(error);
+  //   }
+  // },
 
   searchById: async (modelName, id) => {
     try {
@@ -89,7 +89,7 @@ const persistence = {
         where: { id: id },
       });
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   },
 
@@ -129,7 +129,7 @@ const persistence = {
 
   searchByKeyword: async (keyWord) => {
     try {
-      db.Sequelize.or;
+      
       const respuesta = await db.Product.findAll({
         include: {
           association: "category_product",
