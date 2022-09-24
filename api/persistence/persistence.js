@@ -84,7 +84,7 @@ const persistence = {
       const newData = await db[modelName].create(datos);
       return newData;
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   },
 
