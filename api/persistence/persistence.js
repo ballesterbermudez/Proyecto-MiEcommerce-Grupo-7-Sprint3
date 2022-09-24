@@ -3,19 +3,39 @@ const db = require("../database/models");
 
 const persistence = {
   searchBYUsername: async (username, password) => {
-    try {
-      const user = await db.User.findOne({
-        attributes: ["id", "username"],
-        where: { username: username, password: password },
-        include: {
-          association: "userrole",
-          attributes: ["role"],
-        },
-      });
-      return user;
-    } catch (error) {
-      throw "Error acceso de bd";
-    }
+
+
+      try{
+          const user = await db.User.findOne({
+                           attributes:['id','username'], 
+                           where: {username: username, password: password}, 
+                           include: { 
+                           association: "userrole",
+                           attributes: ["role"] }  
+                          })
+          return user;
+      }catch (error)
+      {
+         throw error
+      }
+
+    },
+
+    searchAll: async (modelName) => {
+        try{
+          const info = await db[modelName].findAll();
+          return info
+        }catch(error){throw error}
+
+    },
+
+    searchById : async (modelName, id) => {
+      try{
+        const info = await db[modelName].findByPk(id);
+        return info
+      }catch(error){throw new Error(error)}
+
+
   },
 
   searchAll: async (modelName) => {
@@ -57,7 +77,9 @@ const persistence = {
       const info = await db[modelName].findByPk(id);
       return info;
     } catch (error) {
-      throw "Error acceso a bd";
+
+      throw error
+
     }
   },
 
@@ -75,7 +97,9 @@ const persistence = {
     try {
       await db[modelName].destroy({ where: { id: id } });
     } catch (error) {
-      throw "Error acceso a bd";
+
+     throw error
+
     }
   },
 
@@ -84,7 +108,9 @@ const persistence = {
       const newData = await db[modelName].create(datos);
       return newData;
     } catch (error) {
-      throw error;
+
+      throw error
+
     }
   },
 
@@ -95,7 +121,9 @@ const persistence = {
       const respuesta = await db[modelName].findAll(criteria);
       return respuesta;
     } catch (error) {
-      throw "Error acceso a bd";
+
+      throw error
+
     }
   },
 
@@ -117,10 +145,9 @@ const persistence = {
           ],
         },
       });
-
       return respuesta;
     } catch (error) {
-      throw new Error("Error acceso a bd");
+      throw error
     }
   },
 
@@ -148,8 +175,10 @@ const persistence = {
       });
 
       return cart;
-    } catch (Error) {
-      throw new Error("Error acceso a bd");
+
+    }catch(Error){
+      throw Error
+
     }
   },
 
@@ -167,7 +196,9 @@ const persistence = {
       });
       return respuesta;
     } catch (error) {
-      throw "Error acceso a bd";
+
+      throw error
+
     }
   },
 };
