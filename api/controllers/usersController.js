@@ -1,3 +1,4 @@
+const { ValidationError, SequelizeScopeError, UniqueConstraintError } = require("sequelize");
 const persistence = require("../persistence/persistence");
 const persistance = require("../persistence/persistence");
 
@@ -97,7 +98,7 @@ const usersController = {
             req.body.profilepic === undefined ? null : req.body.profilepic,
           id_role: req.body.role
         };
-        persistance.inster('User',newUser)
+        await persistance.inster('User',newUser)
         const newUserDT = userConverter(newUser);
 
         res.status(200).json({
@@ -112,7 +113,13 @@ const usersController = {
         });
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.constructor.name);
+      if(error instanceof UniqueConstraintError){
+        res.status(400).json({
+          ok: false,
+          msg: "El email o el username ya estan registrados",
+        });
+      }
       res.status(500).json({
         ok: false,
         msg: "Error al leer la base de datos",
@@ -186,14 +193,11 @@ const usersController = {
     }
   },
   //HACER UPDATE CON BORRAR CARRITO ANTES DE BORRAR USER
-  deleteUser: (req, res) => {
+  deleteUser: async (req, res) => {
     try {
-      const userToDelete = persistence.findByIdDB(
-        "users.json",
-        req.params.userId
-      );
+      const userToDelete = await persistance.searchById('User', req.params.userId)
       if (userToDelete) {
-        persistence.removeFromDB("users.json", userToDelete.id);
+        persistance.delete("User", userToDelete.id);
         const userDeletedDT = userConverter(userToDelete);
         res.status(200).json({
           ok: true,
