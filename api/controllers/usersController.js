@@ -1,3 +1,4 @@
+const persistence = require("../persistence/persistence");
 const persistance = require("../persistence/persistence");
 
 const userConverter = (user) => {
@@ -15,14 +16,13 @@ const userConverter = (user) => {
   return null;
 };
 
-
-const roles = ["GUEST", "ADMIN", "GOD"];
+// const roles = ["GUEST", "ADMIN", "GOD"];
 // ---------------------------------------------------------------------
 
 const usersController = {
   listUsers: async (req, res) => {
     try {
-      const users = await persistance.searchAll('User');
+      const users = await persistance.searchAll("User");
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
         ok: true,
@@ -39,7 +39,7 @@ const usersController = {
   },
   findUserById: async (req, res) => {
     try {
-      const user = await persistance.searchById('User', req.params.userId)
+      const user = await persistance.searchById("User", req.params.userId);
       if (user) {
         const userDT = userConverter(user);
         res.status(200).json({
@@ -61,20 +61,23 @@ const usersController = {
       });
     }
   },
-  createUser: (req, res) => {
+  createUser: async (req, res) => {
     try {
       const { role } = req.body;
-      if (persistence.findByIdDB("users.json", req.body.id)) {
+      //CHECK SI EXISTE UN USUARIO CON EL ID 
+      if (await persistance.searchById("User", req.body.id)) {
         res.status(412).json({
           ok: false,
           msg: `El usuario con id ${req.body.id} ya existe`,
         });
-      } else if (!roles.includes(role.toUpperCase())) {
+      //CHECK SI EL ROLE EXISTE
+      } else if (!(await persistance.searchById('Role', req.body.role))) {
         console.log(req.body.role);
         res.status(412).json({
           ok: false,
           msg: `El rol debe ser GUEST, ADMIN o GOD`,
         });
+      //CHECK SI NO LLEGA NADA VACIO EN EL BODY
       } else if (
         req.body.id !== undefined &&
         req.body.email !== undefined &&
@@ -83,23 +86,19 @@ const usersController = {
         req.body.firstname !== undefined &&
         req.body.lastname !== undefined
       ) {
-        const users = persistence.readDB("users.json");
         const newUser = {
           id: req.body.id,
           email: req.body.email,
           username: req.body.username,
           password: req.body.password,
-          firstname: req.body.firstname,
-          lastname: req.body.lastname,
+          first_name: req.body.firstname,
+          last_name: req.body.lastname,
           profilepic:
             req.body.profilepic === undefined ? null : req.body.profilepic,
-          role: req.body.role.toUpperCase(),
-          cart: [],
+          id_role: req.body.role
         };
-
-        users.push(newUser);
+        persistance.inster('User',newUser)
         const newUserDT = userConverter(newUser);
-        persistence.writeDB("users.json", users);
 
         res.status(200).json({
           ok: true,
@@ -119,9 +118,13 @@ const usersController = {
         msg: "Error al leer la base de datos",
       });
     }
-  },editUser: (req, res) => {
+  },
+  editUser: (req, res) => {
     try {
-      const userToEdit = persistence.findByIdDB("users.json", req.params.userId);
+      const userToEdit = persistence.findByIdDB(
+        "users.json",
+        req.params.userId
+      );
       const { role } = req.body;
       if (role !== undefined && !roles.includes(role.toUpperCase())) {
         res.status(412).json({
@@ -130,9 +133,7 @@ const usersController = {
         });
       } else if (userToEdit) {
         userToEdit.email =
-          req.body.email === undefined 
-            ? userToEdit.email 
-            : req.body.email;
+          req.body.email === undefined ? userToEdit.email : req.body.email;
         userToEdit.username =
           req.body.username === undefined
             ? userToEdit.username
@@ -187,9 +188,12 @@ const usersController = {
   //HACER UPDATE CON BORRAR CARRITO ANTES DE BORRAR USER
   deleteUser: (req, res) => {
     try {
-      const userToDelete = persistence.findByIdDB("users.json", req.params.userId);
+      const userToDelete = persistence.findByIdDB(
+        "users.json",
+        req.params.userId
+      );
       if (userToDelete) {
-        persistence.removeFromDB("users.json", userToDelete.id)
+        persistence.removeFromDB("users.json", userToDelete.id);
         const userDeletedDT = userConverter(userToDelete);
         res.status(200).json({
           ok: true,
