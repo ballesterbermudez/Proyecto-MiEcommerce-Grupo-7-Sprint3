@@ -1,4 +1,8 @@
-const { ValidationError, SequelizeScopeError, UniqueConstraintError } = require("sequelize");
+const {
+  ValidationError,
+  SequelizeScopeError,
+  UniqueConstraintError,
+} = require("sequelize");
 const persistence = require("../persistence/persistence");
 const persistance = require("../persistence/persistence");
 
@@ -65,40 +69,40 @@ const usersController = {
   createUser: async (req, res) => {
     try {
       const { role } = req.body;
-      //CHECK SI EXISTE UN USUARIO CON EL ID 
+      //CHECK SI EXISTE UN USUARIO CON EL ID
       if (await persistance.searchById("User", req.body.id)) {
         res.status(412).json({
           ok: false,
           msg: `El usuario con id ${req.body.id} ya existe`,
         });
-      //CHECK SI EL ROLE EXISTE
-      } else if (!(await persistance.searchById('Role', req.body.role))) {
+        //CHECK SI EL ROLE EXISTE
+      } else if (!(await persistance.searchById("Role", req.body.role))) {
         console.log(req.body.role);
         res.status(412).json({
           ok: false,
           msg: `El rol debe ser GUEST, ADMIN o GOD`,
         });
-      //CHECK SI NO LLEGA NADA VACIO EN EL BODY
+        //CHECK SI NO LLEGA NADA VACIO EN EL BODY
       } else if (
         req.body.id !== undefined &&
         req.body.email !== undefined &&
         req.body.username !== undefined &&
         req.body.password !== undefined &&
-        req.body.firstname !== undefined &&
-        req.body.lastname !== undefined
+        req.body.first_name !== undefined &&
+        req.body.last_name !== undefined
       ) {
         const newUser = {
           id: req.body.id,
           email: req.body.email,
           username: req.body.username,
           password: req.body.password,
-          first_name: req.body.firstname,
-          last_name: req.body.lastname,
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
           profilepic:
             req.body.profilepic === undefined ? null : req.body.profilepic,
-          id_role: req.body.role
+          id_role: req.body.role,
         };
-        await persistance.inster('User',newUser)
+        await persistance.inster("User", newUser);
         const newUserDT = userConverter(newUser);
 
         res.status(200).json({
@@ -114,7 +118,7 @@ const usersController = {
       }
     } catch (error) {
       console.log(error.constructor.name);
-      if(error instanceof UniqueConstraintError){
+      if (error instanceof UniqueConstraintError) {
         res.status(400).json({
           ok: false,
           msg: "El email o el username ya estan registrados",
@@ -126,53 +130,29 @@ const usersController = {
       });
     }
   },
-  editUser: (req, res) => {
+  editUser: async (req, res) => {
     try {
-      const userToEdit = persistence.findByIdDB(
-        "users.json",
-        req.params.userId
-      );
-      const { role } = req.body;
-      if (role !== undefined && !roles.includes(role.toUpperCase())) {
+      const userToEdit = await persistance.searchById("User", req.params.userId);
+      const { id_role } = req.body;
+      if (id_role !== undefined && !(await persistance.searchById("Role", id_role))) {
         res.status(412).json({
           ok: false,
           msg: `El rol debe ser GUEST, ADMIN o GOD`,
         });
       } else if (userToEdit) {
-        userToEdit.email =
-          req.body.email === undefined ? userToEdit.email : req.body.email;
-        userToEdit.username =
-          req.body.username === undefined
-            ? userToEdit.username
-            : req.body.username;
-        userToEdit.password =
-          req.body.password === undefined
-            ? userToEdit.password
-            : req.body.password;
-        userToEdit.firstname =
-          req.body.firstname === undefined
-            ? userToEdit.firstname
-            : req.body.firstname;
-        userToEdit.lastname =
-          req.body.lastname === undefined
-            ? userToEdit.lastname
-            : req.body.lastname;
-        userToEdit.profilepic =
-          req.body.profilepic === undefined
-            ? userToEdit.profilepic
-            : req.body.profilepic;
-        userToEdit.role =
-          req.body.role === undefined
-            ? userToEdit.role
-            : req.body.role.toUpperCase();
-
-        const users = persistence.readDB("users.json");
-        const newUserData = users.filter(
-          (ele) => ele.id !== Number(req.params.userId)
-        );
-        newUserData.push(userToEdit);
-        persistence.writeDB("users.json", newUserData);
-        const userEditedDT = userConverter(userToEdit);
+        const dataToEdit = {
+          email: req.body.email,
+          username: req.body.username,
+          password: req.body.password,
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          profilepic: req.body.profilepic,
+          id_role: req.body.id_role
+        }
+        console.table(dataToEdit)
+        await persistance.updateData('User', req.params.userId, dataToEdit);
+        const userEdited = await persistance.searchById('User', req.params.userId)
+        const userEditedDT = userConverter(userEdited);
         res.status(200).json({
           ok: true,
           msg: `Usuario ${userToEdit.username} editado con exito`,
@@ -195,7 +175,10 @@ const usersController = {
   //HACER UPDATE CON BORRAR CARRITO ANTES DE BORRAR USER
   deleteUser: async (req, res) => {
     try {
-      const userToDelete = await persistance.searchById('User', req.params.userId)
+      const userToDelete = await persistance.searchById(
+        "User",
+        req.params.userId
+      );
       if (userToDelete) {
         persistance.delete("User", userToDelete.id);
         const userDeletedDT = userConverter(userToDelete);
