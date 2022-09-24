@@ -24,6 +24,8 @@ app.get("/pai/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
 
+
+
 app.use("/test", routeTest)  
 
 // Swagger - Documentacion api

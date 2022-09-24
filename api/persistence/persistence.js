@@ -20,10 +20,35 @@ const persistence = {
 
   searchAll: async (modelName) => {
     try {
+      const user = await db.User.findOne({
+        attributes: ["id", "username"],
+        where: { username: username, password: password },
+        include: {
+          association: "userrole",
+          attributes: ["role"],
+        },
+      });
+      return user;
+    } catch (error) {
+      throw "Error acceso de bd";
+    }
+  },
+
+  searchAll: async (modelName) => {
+    try {
       const info = await db[modelName].findAll();
       return info;
     } catch (error) {
       throw "Error acceso a bd";
+    }
+  },
+
+  searchById: async (modelName, id) => {
+    try {
+      const info = await db[modelName].findByPk(id);
+      return info;
+    } catch (error) {
+      throw new Error(error);
     }
   },
 
@@ -42,7 +67,7 @@ const persistence = {
         where: { id: id },
       });
     } catch (error) {
-      throw "Error acceso a bd";
+      throw new Error(error);
     }
   },
 
@@ -56,9 +81,10 @@ const persistence = {
 
   inster: async (modelName, datos) => {
     try {
-      await db[modelName].create(datos);
+      const newData = await db[modelName].create(datos);
+      return newData;
     } catch (error) {
-      throw "Error acceso a bd";
+      throw new Error(error);
     }
   },
 
