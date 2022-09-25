@@ -3,39 +3,37 @@ const db = require("../database/models");
 
 const persistence = {
   searchBYUsername: async (username, password) => {
+    try {
+      const user = await db.User.findOne({
+        attributes: ["id", "username"],
+        where: { username: username, password: password },
+        include: {
+          association: "userrole",
+          attributes: ["role"],
+        },
+      });
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  },
 
+  searchAll: async (modelName) => {
+    try {
+      const info = await db[modelName].findAll();
+      return info;
+    } catch (error) {
+      throw error;
+    }
+  },
 
-      try{
-          const user = await db.User.findOne({
-                           attributes:['id','username'], 
-                           where: {username: username, password: password}, 
-                           include: { 
-                           association: "userrole",
-                           attributes: ["role"] }  
-                          })
-          return user;
-      }catch (error)
-      {
-         throw error
-      }
-
-    },
-
-    searchAll: async (modelName) => {
-        try{
-          const info = await db[modelName].findAll();
-          return info
-        }catch(error){throw error}
-
-    },
-
-    searchById : async (modelName, id) => {
-      try{
-        const info = await db[modelName].findByPk(id);
-        return info
-      }catch(error){throw new Error(error)}
-
-
+  searchById: async (modelName, id) => {
+    try {
+      const info = await db[modelName].findByPk(id);
+      return info;
+    } catch (error) {
+      throw new Error(error);
+    }
   },
 
   // searchAll: async (modelName) => {
@@ -54,35 +52,6 @@ const persistence = {
   //   }
   // },
 
-  // searchAll: async (modelName) => {
-  //   try {
-  //     const info = await db[modelName].findAll();
-  //     return info;
-  //   } catch (error) {
-  //     throw "Error acceso a bd";
-  //   }
-  // },
-
-  // searchById: async (modelName, id) => {
-  //   try {
-  //     const info = await db[modelName].findByPk(id);
-  //     return info;
-  //   } catch (error) {
-  //     throw new Error(error);
-  //   }
-  // },
-
-  searchById: async (modelName, id) => {
-    try {
-      const info = await db[modelName].findByPk(id);
-      return info;
-    } catch (error) {
-
-      throw error
-
-    }
-  },
-
   updateData: async (modelName, id, datos) => {
     try {
       await db[modelName].update(datos, {
@@ -97,9 +66,7 @@ const persistence = {
     try {
       await db[modelName].destroy({ where: { id: id } });
     } catch (error) {
-
-     throw error
-
+      throw error;
     }
   },
 
@@ -108,9 +75,7 @@ const persistence = {
       const newData = await db[modelName].create(datos);
       return newData;
     } catch (error) {
-
-      throw error
-
+      throw error;
     }
   },
 
@@ -121,15 +86,12 @@ const persistence = {
       const respuesta = await db[modelName].findAll(criteria);
       return respuesta;
     } catch (error) {
-
-      throw error
-
+      throw error;
     }
   },
 
   searchByKeyword: async (keyWord) => {
     try {
-      
       const respuesta = await db.Product.findAll({
         include: {
           association: "category_product",
@@ -147,7 +109,7 @@ const persistence = {
       });
       return respuesta;
     } catch (error) {
-      throw error
+      throw error;
     }
   },
 
@@ -175,10 +137,8 @@ const persistence = {
       });
 
       return cart;
-
-    }catch(Error){
-      throw Error
-
+    } catch (Error) {
+      throw Error;
     }
   },
 
@@ -188,15 +148,13 @@ const persistence = {
     try {
       const respuesta = await db.Product.findByPk(id, {
         include: {
-          association: 'galery'
+          association: "galery",
         },
         attributes: [],
       });
       return respuesta;
     } catch (error) {
-
-      throw error
-
+      throw error;
     }
   },
 };

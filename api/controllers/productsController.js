@@ -78,8 +78,8 @@ const controller = {
             //crea un producto: requiere titulo y precio a travez de un middleware
      create: async (req,resp) =>{
 
-            const {title,price,description,category, mostwanted, stock} = req.body;
-            const product = {title,price,description, id_category: category, mostwanted, stock}
+            const {title,price,description, id_category, mostwanted, stock} = req.body;
+            const product = {title,price,description, id_category, mostwanted, stock}
 
             try{
                 
