@@ -32,7 +32,7 @@ const persistence = {
       const info = await db[modelName].findByPk(id);
       return info;
     } catch (error) {
-      throw new Error(error);
+      throw error;
     }
   },
 
