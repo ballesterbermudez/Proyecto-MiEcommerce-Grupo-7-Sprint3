@@ -1,9 +1,7 @@
 
 const path = require('path');
-const picture = require('./pictureController')
 const persistence = require('../persistence/persistence');
-const { ValidationErrorItem, ValidationError } = require('sequelize');
-const { type } = require('os');
+const { ValidationError } = require('sequelize');
 const modelName = "Product"
 
 
@@ -75,19 +73,23 @@ const controller = {
          }
 
         } ,
-            //crea un producto: requiere titulo y precio a travez de un middleware
+            //crea un producto
      create: async (req,resp) =>{
 
-            const {title,price,description, id_category, mostwanted, stock} = req.body;
-            const product = {title,price,description, id_category, mostwanted, stock}
+            const {title,price,description, category, mostwanted, stock} = req.body;
+            const product = {title,price,description, id_category: category, mostwanted, stock}
 
             try{
+
+                if(await persistence.searchById("Category", category))
+                {
+                    const newProd = await persistence.inster(modelName,product);
+                    resp.status(200).json(newProd);
+                }
+                else{
+                    resp.status(404).json({message: "no se encontro la categoria"})
+                }
                 
-                 const newProd = await persistence.inster(modelName,product);
-                 
-
-                resp.status(200).json(newProd);
-
 
             }catch(error){
                 if( error instanceof ValidationError)
