@@ -21,7 +21,8 @@ const controller = {
             if(category)
             {
                 
-                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category.toLowerCase()}}
+                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category.toLowerCase()}
+                                  ,include: {association: 'galery', limit: 1 }}
                 const data = await persistence.searchByCriteria("Category",criteria);
                 
                 resp.status(200).json(data);
@@ -30,7 +31,8 @@ const controller = {
             else
             {
 
-                const criteria = {include: {association: 'category_product', attributes: ["title"]}}
+                const criteria = {include: {association: 'category_product', attributes: ["title"]}, 
+                                  include: {association: 'galery', limit: 1 }}
                 const data = await persistence.searchByCriteria(modelName,criteria)
 
                 resp.status(200).json(data);
@@ -51,7 +53,10 @@ const controller = {
 
             if(Number.isInteger(Number(req.params.id)))
             {
-                const prod = await persistence.searchById(modelName,req.params.id)
+                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}
+                                  ,include: {association: 'galery'}, 
+                                  where: {id: req.params.id} }
+                const prod = await persistence.searchByCriteria(modelName,criteria)
             
 
                 if(prod != null)
@@ -69,6 +74,7 @@ const controller = {
             
 
          }catch(error){
+            
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
 
@@ -182,7 +188,7 @@ const controller = {
 
         try{
             
-            const data = await persistence.searchByCriteria(modelName, {where: {mostwanted : true}})
+            const data = await persistence.searchByCriteria(modelName, {include: {association: 'galery', limit: 1 },where: {mostwanted : true}})
         
             resp.status(200).json(data);
 

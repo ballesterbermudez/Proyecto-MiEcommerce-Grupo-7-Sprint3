@@ -105,6 +105,7 @@ const persistence = {
           association: "category_product",
           attributes: ["title"],
         },
+        include: {association: 'galery', limit: 1 },
         where: {
           [db.Sequelize.Op.or]: [
             { description: { [db.Sequelize.Op.like]: "%" + keyWord + "%" } },
