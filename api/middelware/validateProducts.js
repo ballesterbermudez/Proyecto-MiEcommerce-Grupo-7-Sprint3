@@ -2,28 +2,41 @@ const persistence = require("../persistence/persistence");
 
 module.exports = async (req, res, next) => {
   const cart = req.body;
+  let result = null;
   try {
-    cart.forEach(async (product) => {
-      if (typeof product.id_product != "number") {
-        res.status(500).json({
-          ok: false,
-          msg: `El producto ${product.id_product} debe tener un id numerico`,
-        });
-      }
+    // cart.forEach(async (product) => {
+    //   const theProduct = await persistence.searchById(
+    //     "Product",
+    //     product.id_product
+    //   );
+    //   console.log(theProduct);
+    //   if (theProduct == null) {
+    //     result = {
+    //       ok: false,
+    //       msg: `El producto con id ${product.id_product} no existe en la base de datos`,
+    //     };
+    //   }
+    // });
+
+    for (let i = 0; i < cart.length; i++) {
       const theProduct = await persistence.searchById(
         "Product",
-        product.id_product
+        cart[i].id_product
       );
-      if (!theProduct) {
-        res.status(404).json({
+      console.log(theProduct);
+      if (theProduct == null) {
+        result = {
           ok: false,
-          msg: `El producto con id ${product.id_product} no existe en la base de datos`,
-        });
+          msg: `El producto con id ${cart[i].id_product} no existe en la base de datos`,
+        };
       }
-    });
+    }
+    if (result != null) {
+      res.status(404).json(result);
+    } else {
+      next();
+    }
   } catch (err) {
-    console.log(err);
+    res.send(err);
   }
-
-  next();
 };

@@ -1,4 +1,5 @@
 const persistance = require("../persistence/persistence");
+const { ValidationError } = require("sequelize");
 
 const cartController = {
   listCart: async (req, res) => {
@@ -35,7 +36,22 @@ const cartController = {
         modifiedCart,
       });
     } catch (error) {
-      res.send(error);
+      if (error instanceof ValidationError) {
+        let errorArray = [];
+        error.errors.forEach((el, i) => {
+          if (el.message == "PRIMARY must be unique") {
+            el.message = "No pueden haber dos productos con mismo id";
+          }
+
+          errorArray[i] = el.message;
+        });
+        res.status(401).json({ ok: false, msg: errorArray });
+      } else {
+        res
+          .status(500)
+
+          .json({ ok: false, msg: "No fue posible modificar el carrito" });
+      }
     }
   },
 };
