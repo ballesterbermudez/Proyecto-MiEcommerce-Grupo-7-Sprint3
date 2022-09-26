@@ -1,11 +1,15 @@
-const persistance = require('../persistence/persistence')
+const persistance = require("../persistence/persistence");
 
-module.exports = (req, res, next) => {
-    if(!persistance.searchById(User, req.params.id)){
-        res.status(404).json({
-            ok: false,
-            msg: 'No hay usuarios con el id ' + req.params.id,
-        })
+module.exports = async (req, res, next) => {
+  try {
+    if (!(await persistance.searchById("User", req.params.id))) {
+      res.status(404).json({
+        ok: false,
+        msg: "No hay usuarios con el id " + req.params.id,
+      });
     }
-
-}
+  } catch (err) {
+    console.log(err);
+  }
+  next();
+};

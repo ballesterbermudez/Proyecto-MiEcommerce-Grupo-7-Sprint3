@@ -72,9 +72,9 @@ const persistence = {
 
   deleteCartByUserId: async (userId) => {
     try {
-      await db.Cart.destroy({ where: { id_user: userId } });
+      await db.Cart.destroy({ where: { id_usuario: userId } });
     } catch (error) {
-      throw "Error acceso a bd";
+      throw error;
     }
   },
 

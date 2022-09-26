@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const routeCarts = require("./api/routes/routeCarts");
@@ -6,7 +6,7 @@ const routeLogin = require("./api/routes/routeLogin");
 const routePictures = require("./api/routes/routePictures");
 const routeProducts = require("./api/routes/routeProducts");
 const routeUsers = require("./api/routes/routeUsers");
-const routeTest = require('./api/routes/routeTest');
+const routeTest = require("./api/routes/routeTest");
 const verifyJWT = require("./api/middelware/verifyJWT");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -24,9 +24,7 @@ app.get("/pai/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
 
-
-
-app.use("/test", routeTest)  
+app.use("/test", routeTest);
 
 // Swagger - Documentacion api
 
@@ -43,7 +41,6 @@ app.use("/api/v1/carts", verifyJWT, routeCarts);
 // Server open
 
 app.listen(process.env.PORT, async () => {
-  
   try {
     await db.sequelize.authenticate();
     console.log("Connection has been established successfully.");
