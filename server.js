@@ -6,6 +6,7 @@ const routeLogin = require("./api/routes/routeLogin");
 const routePictures = require("./api/routes/routePictures");
 const routeProducts = require("./api/routes/routeProducts");
 const routeUsers = require("./api/routes/routeUsers");
+const routeCategory = require('./api/routes/routeCategory');
 const routeTest = require('./api/routes/routeTest');
 const verifyJWT = require("./api/middelware/verifyJWT");
 const swaggerUi = require("swagger-ui-express");
@@ -39,6 +40,7 @@ app.use("/api/v1/pictures", verifyJWT, routePictures);
 app.use("/api/v1/products", verifyJWT, routeProducts);
 app.use("/api/v1/users", routeUsers);
 app.use("/api/v1/carts", verifyJWT, routeCarts);
+app.use("/api/v1/category", verifyJWT, routeCategory)
 
 // Server open
 

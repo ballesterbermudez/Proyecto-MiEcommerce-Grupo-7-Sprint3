@@ -1,5 +1,3 @@
-const fs = require("fs");
-const path = require("path");
 const { getProduct } = require("./productsController");
 const persistance = require('../persistence/persistence')
 //const { getProduct } = require("./productsController");
