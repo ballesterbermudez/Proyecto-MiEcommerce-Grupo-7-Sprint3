@@ -35,36 +35,55 @@ module.exports = function (sequelize, DataTypes) {
             throw new Error('El username debe contener al menos un caracter');
           }
         },
-        min: { args: 4, msg: "El username debe tener 4 caracteres minimo" },
+        len: { args: [4,50], msg: "El username debe ser entre 4 y 50 caracteres" },
       }
     },
     password: {
       type: DataTypes.STRING(50),
       allowNull: false,
       validate: {
-        min: { args: 6, msg: "La contrasenia debe tener 6 caracteres minimo" },
+        isStr(data){
+          if (!(typeof data === 'string')) {
+            throw new Error('El password debe ser un string');
+          }
+        },
+        len: { args: [6, 50], msg: "El password debe ser entre 6 y 50 caracteres" },
       }
     },
     first_name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       validate: {
+        isStr(data){
+          if (!(typeof data === 'string')) {
+            throw new Error('El nombre debe ser un string');
+          }
+        },
         is: {
           args: ["^[a-z]+$", "i"],
           msg: "El nombre no debe contener numeros",
         },
         notEmpty: { msg: "El nombre no puede ser vacio" },
+        len: { args: [2, 50], msg: "El nombre debe ser entre 2 y 50 caracteres" },
+
       }
     },
     last_name: {
       type: DataTypes.STRING(50),
       allowNull: false,
       validate: {
+        isStr(data){
+          if (!(typeof data === 'string')) {
+            throw new Error('El apellido debe ser un string');
+          }
+        },
         is: {
           args: ["^[a-z]+$", "i"],
           msg: "El apellido no debe contener numeros",
         },
         notEmpty: { msg: "El apellido no puede ser vacio" },
+        len: { args: [2, 50], msg: "El apellido debe ser entre 2 y 50 caracteres" },
+
       }
     },
     profilepic: {
