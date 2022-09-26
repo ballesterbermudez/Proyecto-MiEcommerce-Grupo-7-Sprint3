@@ -2,6 +2,7 @@
 const path = require('path');
 const persistence = require('../persistence/persistence');
 const { ValidationError } = require('sequelize');
+const models = require('../database/models')
 const modelName = "Product"
 
 
@@ -21,8 +22,13 @@ const controller = {
             if(category)
             {
                 
-                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category.toLowerCase()}
-                                  ,include: {association: 'galery', limit: 1 }}
+                const criteria = {include: {
+                    association: 'product_category',
+                    attributes: ["id", "title"],
+                    include: {association: 'galery', limit: 1}}, 
+                    where: {title: category.toLowerCase()},
+                   
+                    }
                 const data = await persistence.searchByCriteria("Category",criteria);
                 
                 resp.status(200).json(data);
@@ -41,6 +47,7 @@ const controller = {
             
 
          }catch(error){
+            console.log(error)
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
         },
@@ -59,7 +66,7 @@ const controller = {
                 const prod = await persistence.searchByCriteria(modelName,criteria)
             
 
-                if(prod != null)
+                if(prod.length > 0)
                 {
                     resp.status(200).json(prod);
                 }
@@ -168,17 +175,17 @@ const controller = {
 
             const keyword = req.query.q;
              try{
-            
+                
                 const data = await persistence.searchByKeyword(keyword)
                
-                if(data != null) {
+                if(data.length > 0) {
                     resp.status(200).json(data)
                 } else {
                     resp.status(404).json({message: "No hubieron resultados"});
                 }
 
             }catch(error){
-
+                    console.log(error)
             resp.status(500).json({message : "Error interno"})
 
             }
@@ -190,7 +197,13 @@ const controller = {
             
             const data = await persistence.searchByCriteria(modelName, {include: {association: 'galery', limit: 1 },where: {mostwanted : true}})
         
-            resp.status(200).json(data);
+            if(data.length > 0){
+                resp.status(200).json(data);
+            }
+            else{
+                resp.status(404).json({message: "No hubieron resultados"});
+            }
+            
 
          }catch(error){
            
