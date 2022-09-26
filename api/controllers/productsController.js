@@ -1,7 +1,7 @@
 
 const path = require('path');
-const picture = require('./pictureController')
 const persistence = require('../persistence/persistence');
+const { ValidationError } = require('sequelize');
 const modelName = "Product"
 
 
@@ -20,7 +20,8 @@ const controller = {
 
             if(category)
             {
-                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category}}
+                
+                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category.toLowerCase()}}
                 const data = await persistence.searchByCriteria("Category",criteria);
                 
                 resp.status(200).json(data);
@@ -47,40 +48,59 @@ const controller = {
 
         try{
 
-            
-            const prod = await persistence.searchById(modelName,req.params.id)
+
+            if(Number.isInteger(Number(req.params.id)))
+            {
+                const prod = await persistence.searchById(modelName,req.params.id)
             
 
-            if(prod != null)
-            {
-                resp.status(200).json(prod);
+                if(prod != null)
+                {
+                    resp.status(200).json(prod);
+                }
+                else
+                {
+                    resp.status(404).json({message: "Producto no encontrado"});
+                }
             }
-            else
-            {
-                resp.status(404).json({message: "Producto no encontrado"});
+            else {
+                resp.status(401).json({message: "El id proporcionado no es un entero"})
             }
+            
 
          }catch(error){
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
 
         } ,
-            //crea un producto: requiere titulo y precio a travez de un middleware
+            //crea un producto
      create: async (req,resp) =>{
 
-            let product = req.product;
+            const {title,price,description, category, mostwanted, stock} = req.body;
+            const product = {title,price,description, id_category: category, mostwanted, stock}
 
             try{
+
+                if(await persistence.searchById("Category", category))
+                {
+                    const newProd = await persistence.inster(modelName,product);
+                    resp.status(200).json(newProd);
+                }
+                else{
+                    resp.status(404).json({message: "no se encontro la categoria"})
+                }
                 
-                 const newProd = await persistence.inster(modelName,product);
-                 
-
-                resp.status(200).json(newProd);
-
 
             }catch(error){
-                console.log(error)
-                resp.status(500).json({message: "No se pudo insertar la informacion"});
+                if( error instanceof ValidationError)
+                {
+                    let errorArray = []
+                    error.errors.forEach((el,i) => {errorArray[i] = el.message})
+                    resp.status(401).json(errorArray)
+                }
+                else{
+                    resp.status(500).json({message: "No fue posible insertar el producto"});
+                }
             }
 
         },
@@ -90,55 +110,49 @@ const controller = {
 
             try{
 
-                let product = await persistence.searchById(modelName, req.params.id)
+                if(Number.isInteger(Number(req.params.id)))
+                {
+                    let product = await persistence.searchById(modelName, req.params.id)
   
-                if(product != null)
-                {
-                    let {...parametorsModificados} = req.body;
-                   
-                    if(parametorsModificados.price)
+                    if(product != null)
                     {
-                        
-                        if(parametorsModificados.price < 0)
-                        {
-                            
-                            return resp.status(401).json({message: "Precio no puede ser negativo"})
+                        let {...parametorsModificados} = req.body;
+                   
+                        const newProd = {
+                            title: parametorsModificados.title,
+                            price: parametorsModificados.price,
+                            description: parametorsModificados.description,
+                            id_category: parametorsModificados.category,
+                            mostwanted: parametorsModificados.mostwanted,
+                            stock: parametorsModificados.stock
                         }
+
+                        await persistence.updateData(modelName,req.params.id,newProd)
+                    
+                        product = await persistence.searchById(modelName, req.params.id)
+                   
+
+                        resp.status(200).json(product);
                     }
-                    
-                    
-                    
-                    
-                    if(parametorsModificados.id)
+                    else 
                     {
-                        parametorsModificados.id = undefined
+                     resp.status(404).json({message: "Producto no encontrado"});
                     }
-
-                    const newProd = {
-                        title: parametorsModificados.title,
-                        price: parametorsModificados.price,
-                        description: parametorsModificados.description,
-                        id_category: parametorsModificados.category,
-                        mostwanted: parametorsModificados.mostwanted,
-                        stock: parametorsModificados.stock
-                    }
-
-                    await persistence.updateData(modelName,req.params.id,newProd)
-                    
-                    product = await persistence.searchById(modelName, req.params.id)
-                   
-
-                    resp.status(200).json(product);
+                 }
+                else {
+                     resp.status(401).json({message: "El id proporcionado no es un entero"})
                 }
-                else 
-                {
-                    resp.status(404).json({message: "Producto no encontrado"});
-                }
-                   
-
+ 
             }catch(error){
-                console.log(error)
-                resp.status(500).json( {message : "Error interno del servidor", error});
+                if( error instanceof ValidationError)
+                {
+                    let errorArray = []
+                    error.errors.forEach((el,i) => {errorArray[i] = el.message})
+                    resp.status(401).json(errorArray)
+                }
+                else{
+                    resp.status(500).json({message: "No fue posible modificar el producto"});
+                }
             }
 
 
@@ -158,7 +172,9 @@ const controller = {
                 }
 
             }catch(error){
-            resp.status(500).json({message : "Error interno", error: error.message})
+
+            resp.status(500).json({message : "Error interno"})
+
             }
         },
 
@@ -200,27 +216,6 @@ const controller = {
 
     },
 
-            //MIDDLEWARE: chequea que los datos titulo y precio hayan sido pasados envia el producto armado a create
-    chekData: (req,resp,next) => {
-
-            let {title,price,description,category, mostwanted, stock} = req.body;
-            
-            if(!title || !price || !category)
-            {
-                resp.status(400).json({mssage: "Los valores  title, precio y categoria son obligatorios"})
-            }
-            else {
-                if(Number(price) < 0)
-                {
-                    resp.status(401).json({mssage: "El precio no puede ser negativo"})
-                }
-                else
-                {
-                    req.product = {title,price,description,id_category: category ,mostwanted,stock} 
-                    next();
-                }
-            }
-        },
 
 }
 
