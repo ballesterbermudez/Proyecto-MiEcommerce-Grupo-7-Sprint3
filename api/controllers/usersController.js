@@ -102,7 +102,6 @@ const usersController = {
             req.body.profilepic === undefined ? null : req.body.profilepic,
           id_role: req.body.id_role,
         };
-        console.table(newUser)
         await persistance.inster("User", newUser);
         const newUserDT = userConverter(newUser);
 
