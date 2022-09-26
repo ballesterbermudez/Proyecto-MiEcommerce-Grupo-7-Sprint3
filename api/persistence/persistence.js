@@ -35,7 +35,7 @@ const persistence = {
       try{
         const info = await db[modelName].findByPk(id);
         return info
-      }catch(error){throw "Error acceso a bd"}
+      }catch(error){throw new Error(error)}
 
   },
 
@@ -43,15 +43,17 @@ const persistence = {
 
     try {
 
-         await  db[modelName].update(
+          await  db[modelName].update(
             datos,
           {
             where: {id: id}
           })
-
+          
 
     } catch (error) {
-      throw "Error acceso a bd"
+      
+      
+      throw new Error(error)
     }
 
   },
@@ -63,7 +65,16 @@ const persistence = {
        await db[modelName].destroy({where: {id: id}})
 
     } catch (error) {
+      
      throw "Error acceso a bd"
+    }
+  },
+
+  deleteCartByUserId: async (userId) => {
+    try{
+        await db.Cart.destroy({where: {id_user: userId}})
+    }catch (error){
+      throw 'Error acceso a bd'
     }
   },
 
@@ -73,10 +84,11 @@ const persistence = {
 
     try {
       
-      await db[modelName].create(datos);
+      const newData = await db[modelName].create(datos);
+      return newData
 
     } catch (error) {
-      throw "Error acceso a bd"
+      throw new Error(error)
     }
 
   },
@@ -116,8 +128,7 @@ const persistence = {
             
           }
           
-     
-      });
+    });
 
       return respuesta
   
@@ -148,8 +159,27 @@ const persistence = {
       throw new Error("Error acceso a bd")
     }
 
-  }
+  },
 
+  //Obtener fotos de un producto
+
+  searchPictureByProduct: async (id) => {
+
+    try {
+
+      const respuesta = await db.Product.findByPk(id, {
+        include: {
+          association: 'galery'
+        },
+        attributes: {exclude: ['id','title', 'price', 'description', 'id_category']}
+      });
+      return respuesta
+  
+    } catch (error) {
+
+      throw "Error acceso a bd"
+    }
+  },
 
 }
  

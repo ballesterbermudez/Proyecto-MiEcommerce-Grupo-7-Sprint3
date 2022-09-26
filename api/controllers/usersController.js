@@ -1,7 +1,4 @@
-const persistence = require('../persistence/persistence');
-const db = require('../database/models');
-
-
+const persistance = require("../persistence/persistence");
 
 const userConverter = (user) => {
   if (user) {
@@ -9,11 +6,9 @@ const userConverter = (user) => {
       id: user.id,
       email: user.email,
       username: user.username,
-      firstname: user.firstname,
-      lastname: user.lastname,
+      first_name: user.first_name,
+      last_name: user.last_name,
       profilepic: user.profilepic,
-      role: user.role,
-      cart: user.cart,
     };
     return userDT;
   }
@@ -27,8 +22,7 @@ const roles = ["GUEST", "ADMIN", "GOD"];
 const usersController = {
   listUsers: async (req, res) => {
     try {
-      //const users = persistence.readDB("users.json");
-      const users = await User.findAll();
+      const users = await persistance.searchAll('User');
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
         ok: true,
@@ -43,9 +37,9 @@ const usersController = {
       });
     }
   },
-  findUserById: (req, res) => {
+  findUserById: async (req, res) => {
     try {
-      const user = persistence.findByIdDB("users.json", req.params.userId);
+      const user = await persistance.searchById('User', req.params.userId)
       if (user) {
         const userDT = userConverter(user);
         res.status(200).json({

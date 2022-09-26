@@ -12,7 +12,7 @@ const pictureController = {
                     return res.status(400).json('debe ingresar un id') 
                 }
             }
-            let producto = persistence.findByIdDB("products.json" , idProd)   
+            let producto = persistence.searchPictureByProduct(idProd)   
             if(producto) {
                 return res.status(200).json(producto.gallery)
             } else {

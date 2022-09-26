@@ -8,19 +8,22 @@ const login = async (req, res) => {
     const user = await persistance.searchBYUsername(username, password);
    
     if (user != null) {
+      
+      const {id,username,userrole}=user
+      const {role}=userrole
 
       const payload = {
-        id: user.id,
-        username: user.username,
-        role: user.userrole.role,
+        id: id,
+        username: username,
+        role: role,
       };
 
       res.status(200).json({
         success: true,
         message: "Authorized",
         user: {
-          iduser: user.id,
-          username: user.username,
+          iduser: id,
+          username:username,
         },
         token: await generateJWT(payload),
       });

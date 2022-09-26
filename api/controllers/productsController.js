@@ -2,6 +2,7 @@
 const path = require('path');
 const picture = require('./pictureController')
 const persistence = require('../persistence/persistence');
+const modelName = "Product"
 
 
 const directory = path.resolve(__dirname,"..","data",)
@@ -9,29 +10,28 @@ const directory = path.resolve(__dirname,"..","data",)
 const controller = {
 
         //retorna la lista de los productos
-    list: (req,resp) => {
+    list: async (req,resp) => {
 
          try{
             
            
-            const data = persistence.readDB("products.json")
             const category = req.query.category;
+            
 
             if(category)
             {
-                const info = data.filter(el => el.category == category)
-                if(info.length > 0)
-                {
-                    resp.status(200).json(info);
-                }
-                else
-                {
-                    resp.status(404).json({message: "no se encontro ningun producto con esa categoria"});
-                }
-               
+                const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}, where: {title: category}}
+                const data = await persistence.searchByCriteria("Category",criteria);
+                
+                resp.status(200).json(data);
+                
             }
             else
             {
+
+                const criteria = {include: {association: 'category_product', attributes: ["title"]}}
+                const data = await persistence.searchByCriteria(modelName,criteria)
+
                 resp.status(200).json(data);
             }
 
@@ -43,14 +43,15 @@ const controller = {
         },
     
         //retorna los detalles de un producto
-    details: (req,resp) =>{
+    details: async (req,resp) =>{
 
         try{
 
             
-            const prod = persistence.findByIdDB("products.json", req.params.id)
+            const prod = await persistence.searchById(modelName,req.params.id)
+            
 
-            if(prod)
+            if(prod != null)
             {
                 resp.status(200).json(prod);
             }
@@ -65,49 +66,33 @@ const controller = {
 
         } ,
             //crea un producto: requiere titulo y precio a travez de un middleware
-     create: (req,resp) =>{
+     create: async (req,resp) =>{
 
             let product = req.product;
 
             try{
                 
-                
-                const data = persistence.readDB("products.json")
-                const id = data[data.length - 1].id + 1;
-                
-                if(product.gallery.length > 0)
-                {
-                    
-                     const newGallery = product.gallery.map(el=> {let pic = picture.getPicture(el);
-                        
-                        return pic;
-                    });
-                    product.gallery = newGallery;
-                }
-               
-                let newProduct = {id, ...product}
+                 const newProd = await persistence.inster(modelName,product);
+                 
 
-                data.push(newProduct);
-
-                persistence.writeDB("products.json", data);
-
-                resp.status(200).json(newProduct);
+                resp.status(200).json(newProd);
 
 
             }catch(error){
-                resp.status(500).json( {message : "Error interno del servidor"});
+                console.log(error)
+                resp.status(500).json({message: "No se pudo insertar la informacion"});
             }
 
         },
             //modifica un producto existente
-    modify: (req,resp) => {
+    modify: async (req,resp) => {
 
 
             try{
 
-                let product = persistence.findByIdDB("products.json", req.params.id)
-
-                if(product)
+                let product = await persistence.searchById(modelName, req.params.id)
+  
+                if(product != null)
                 {
                     let {...parametorsModificados} = req.body;
                    
@@ -120,109 +105,86 @@ const controller = {
                             return resp.status(401).json({message: "Precio no puede ser negativo"})
                         }
                     }
-                    if(parametorsModificados.gallery)
-                    {
-                        let nuevagalleria = parametorsModificados.gallery.map(el =>{
-                        let pictures = picture.getPicture(el);
-                        return pictures;
-                    })
-                    parametorsModificados.gallery = nuevagalleria;
-                    }
+                    
+                    
+                    
+                    
                     if(parametorsModificados.id)
                     {
-                        parametorsModificados.id = Number(req.params.id)
+                        parametorsModificados.id = undefined
                     }
 
-                    const modifiedProd = { ...product , ...parametorsModificados }
-                    persistence.updateDB("products.json", modifiedProd);
+                    const newProd = {
+                        title: parametorsModificados.title,
+                        price: parametorsModificados.price,
+                        description: parametorsModificados.description,
+                        id_category: parametorsModificados.category,
+                        mostwanted: parametorsModificados.mostwanted,
+                        stock: parametorsModificados.stock
+                    }
 
-                    resp.status(200).json(modifiedProd);
+                    await persistence.updateData(modelName,req.params.id,newProd)
+                    
+                    product = await persistence.searchById(modelName, req.params.id)
+                   
+
+                    resp.status(200).json(product);
                 }
-                else
+                else 
                 {
                     resp.status(404).json({message: "Producto no encontrado"});
                 }
                    
 
             }catch(error){
-                resp.status(500).json( {message : "Error interno del servidor"});
+                console.log(error)
+                resp.status(500).json( {message : "Error interno del servidor", error});
             }
 
 
         },
         //busca un producto a travez de una palabra clave
-    search: (req,resp) => {
+    search: async (req,resp) => {
 
             const keyword = req.query.q;
-
-           
-
-        try{
+             try{
             
-            const data = persistence.readDB("products.json");
-
-            const info = data.filter(el=> {
-                let ret;
-                if(el.title.includes(keyword) )
-                {
-                    ret = el;
-                }
-                if(el.description)
-                {
-                    if(el.description.includes(keyword))
-                        ret = el;
-                }
-                if(el.category)
-                {
-                    if(el.category.includes(keyword))
-                        ret = el
-                }
-                return ret
+                const data = await persistence.searchByKeyword(keyword)
                
-            })
-            if(info.length > 0) {
-                resp.status(200).json(info)
-            } else {
-                resp.status(404).json({message: "No hubieron resultados"});
-            }
+                if(data != null) {
+                    resp.status(200).json(data)
+                } else {
+                    resp.status(404).json({message: "No hubieron resultados"});
+                }
 
-        }catch(error){
+            }catch(error){
             resp.status(500).json({message : "Error interno", error: error.message})
-        }
-         
-
-
-
+            }
         },
 
-    mostwanted: (req,resp) => {
+    mostwanted: async (req,resp) => {
 
         try{
             
-           
-           
-            const data = persistence.readDB("products.json")
-          
-            const info = data.filter(el => el.mostwanted == true)
-
-            resp.status(200).json(info);
+            const data = await persistence.searchByCriteria(modelName, {where: {mostwanted : true}})
+        
+            resp.status(200).json(data);
 
          }catch(error){
+           
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
     },
 
     //borra el producto con id pasado por parametro
-    delete: (req,resp) => {
+    delete: async (req,resp) => {
         try{
-            
-           
-         
-            const product = persistence.findByIdDB("products.json", req.params.id);
 
-            if(product)
+            const product = await persistence.searchById(modelName,req.params.id)
+
+            if(product != null)
             {
-                persistence.removeFromDB("products.json", req.params.id)
+                await persistence.delete(modelName,req.params.id)
                 resp.status(200).json(product);
             }
             else
@@ -232,7 +194,8 @@ const controller = {
             
 
          }catch(error){
-            resp.status(500).json( {message : "Error interno", message: error.message});
+            console.log(error)
+            resp.status(500).json( {message : "Error interno"});
          }
 
     },
@@ -240,11 +203,11 @@ const controller = {
             //MIDDLEWARE: chequea que los datos titulo y precio hayan sido pasados envia el producto armado a create
     chekData: (req,resp,next) => {
 
-            let {title,price,description,image,gallery,category, mostwanted, stock} = req.body;
+            let {title,price,description,category, mostwanted, stock} = req.body;
             
-            if(!title || !price)
+            if(!title || !price || !category)
             {
-                resp.status(400).json({mssage: "Los valores  title y precio son obligatorios"})
+                resp.status(400).json({mssage: "Los valores  title, precio y categoria son obligatorios"})
             }
             else {
                 if(Number(price) < 0)
@@ -253,18 +216,12 @@ const controller = {
                 }
                 else
                 {
-                    req.product = {title,price,description,image,gallery,category, mostwanted, stock} 
+                    req.product = {title,price,description,id_category: category ,mostwanted,stock} 
                     next();
                 }
             }
         },
 
-    getProduct: (id) => {
-        
-        let retorno = persistence.findByIdDB("products.json", id);
-
-    return retorno
-    },
 }
 
 

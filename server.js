@@ -20,9 +20,11 @@ app.use(express.json());
 
 // Home
 
-app.get("/api/v1", (req, res) => {
+app.get("/pai/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
+
+
 
 app.use("/test", routeTest)  
 

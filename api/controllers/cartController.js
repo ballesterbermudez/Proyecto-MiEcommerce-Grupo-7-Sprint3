@@ -1,63 +1,32 @@
 const persistance = require("../persistence/persistence");
 
-function getCarrito(req, res) {
-  const users = cargarUsuarios();
-  const { id } = req.params;
-  const user = users.find((el) => el.id === Number(id));
-  if (user) {
-    res.status(200).json({
-      user: id,
-      cart: user.cart,
+const cartController = {
+  listCart: (req, res) => {
+    const cart = persistance.getCartByUserID(req.params.id);
+    if (cart) {
+      res.send(cart);
+    }
+    res.json({
+      ok: false,
+      msg: "No se encontraron usuarios con el id " + res.params.id,
     });
-  } else {
-    res.status(404).json({ msg: `Usuario con id ${id} no fue encontrado` });
-  }
-}
-
-function putCarrito(req, res) {
-  const { id } = req.params;
-  const user = persistance.findByIdDB("users.json", id);
-  if (user) {
-    user.cart = [];
-    req.body.forEach((elem) => {
-      if (typeof elem.product == "number") {
-        if (getProduct(elem.product) == -1) {
-          res.status(404).json({
-            msg: `El producto con id ${elem.product} no fue encontrado`,
-          });
-        }
-      } else {
-        res.status(400).json({
-          ok: false,
-          msg: `El producto ${id} debe tener un id númerico`,
-        });
-      }
-      if (typeof elem.quantity == "number") {
-        if (elem.quantity < 1) {
-          res.status(400).json({
-            ok: false,
-            msg: `El producto ${id} debe tener una cantidad mayor a cero.`,
-          });
-        }
-      } else {
-        res.status(400).json({
-          ok: false,
-          msg: `El producto ${id} debe tener una cantidad númerica`,
-        });
-      }
-      user.cart.push({ product: elem.product, quantity: elem.quantity });
-    });
-
-    persistance.updateDB("users.json", user);
-
-    res.status(200).json({
+  },
+  modifyCart: (req, res) => {
+    persistance.deleteCartByUserId(req.params.id);
+    const newCart = req.body;
+    newCart.forEach((product) =>
+      persistance.inster(Cart, {
+        id_product: product.id,
+        id_user: req.params.id,
+      })
+    );
+    const modifiedCart = persistance.getCartByUserID(req.params.id);
+    res.json({
       msg: "Carrito modificado",
-      user: id,
-      cart: user.cart,
+      user: req.params.id,
+      cart: modifiedCart,
     });
-  } else {
-    res.status(404).json({ msg: `Usuario con id ${id} no fue encontrado` });
-  }
-}
+  },
+};
 
-module.exports = { getCarrito, putCarrito };
+module.exports = cartController;

@@ -90,4 +90,21 @@ try {
 
 })
 
+router.get('/pictures', async (req,resp)=> {
+
+  try {
+    
+    const id = 6;
+    const result = await persistence.searchPictureByProduct(id)
+
+    
+
+    resp.send(result);
+  } catch (error) {
+     resp.send(error)
+  }
+  
+
+})
+
 module.exports = router
