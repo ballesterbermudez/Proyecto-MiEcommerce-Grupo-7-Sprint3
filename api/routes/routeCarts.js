@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const cartController = require("../controllers/cartController");
-const verifiers = require('../middelware/verifys');
+const validateUserId = require("../middelware/validateUserId");
+const validateProducts = require("../middelware/validateProducts");
 
-router.get("/:id", verifiers.checkGetUsers,cartController.getCarrito);
-router.put("/:id", verifiers.checkUpdateUser,cartController.putCarrito);
+router.get("/:id", validateUserId, cartController.listCart);
+router.put("/:id", validateUserId, validateProducts, cartController.modifyCart);
 
 module.exports = router;

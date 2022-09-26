@@ -70,6 +70,14 @@ const persistence = {
     }
   },
 
+  deleteCartByUserId: async (userId) => {
+    try {
+      await db.Cart.destroy({ where: { id_usuario: userId } });
+    } catch (error) {
+      throw error;
+    }
+  },
+
   inster: async (modelName, datos) => {
     try {
       const newData = await db[modelName].create(datos);

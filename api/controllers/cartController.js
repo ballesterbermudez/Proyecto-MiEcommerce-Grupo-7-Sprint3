@@ -1,82 +1,43 @@
-const fs = require("fs");
-const path = require("path");
-const { getProduct } = require("./productsController");
-const persistance = require('../persistence/persistence')
-//const { getProduct } = require("./productsController");
+const persistance = require("../persistence/persistence");
 
-/*FUNCION AUXILIAR:
-Carga los usuarios en la variable que retorna*/
-function cargarUsuarios() {
-  let retorno = undefined;
-  try {
-    retorno = persistance.readDB("users.json");
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ msg: "Base de datos no encontrada" });
-  }
-  return retorno;
-}
+const cartController = {
+  listCart: async (req, res) => {
+    try {
+      const cart = await persistance.getCartByUserID(req.params.id);
 
-
-function getCarrito(req, res) {
-  const users = cargarUsuarios();
-  const { id } = req.params;
-  const user = users.find((el) => el.id === Number(id));
-  if (user) {
-    res.status(200).json({
-      user: id,
-      cart: user.cart,
-    });
-  } else {
-    res.status(404).json({ msg: `Usuario con id ${id} no fue encontrado` });
-  }
-}
-
-function putCarrito(req, res) {
-
-  const { id } = req.params;
-  const user = persistance.findByIdDB("users.json", id)
-  if (user) {
-    user.cart = [];
-    req.body.forEach((elem) => {
-      if (typeof elem.product == "number") {
-        if (getProduct(elem.product) == -1) {
-          res.status(404).json({
-            msg: `El producto con id ${elem.product} no fue encontrado`,
-          });
-        }
+      if (cart) {
+        res.send(cart);
       } else {
-        res.status(400).json({
+        res.status(404).json({
           ok: false,
-          msg: `El producto ${id} debe tener un id númerico`,
+          msg: "No se encontraron usuarios con el id " + req.params.id,
         });
       }
-      if (typeof elem.quantity == "number") {
-        if (elem.quantity < 1) {
-          res.status(400).json({
-            ok: false,
-            msg: `El producto ${id} debe tener una cantidad mayor a cero.`,
-          });
-        }
-      } else {
-        res.status(400).json({
-          ok: false,
-          msg: `El producto ${id} debe tener una cantidad númerica`,
+    } catch (error) {
+      console.log(error);
+    }
+  },
+  modifyCart: async (req, res) => {
+    try {
+      await persistance.deleteCartByUserId(req.params.id);
+      const newCart = req.body;
+      for (let i = 0; i < newCart.length; i++) {
+        await persistance.inster("Cart", {
+          id_product: newCart[i].id_product,
+          id_usuario: req.params.id,
+          quantity: newCart[i].quantity,
         });
       }
-      user.cart.push({ product: elem.product, quantity: elem.quantity });
-    });
+      const modifiedCart = await persistance.getCartByUserID(req.params.id);
+      //console.log(modifiedCart);
+      res.status(200).json({
+        msg: "Carrito modificado",
+        modifiedCart,
+      });
+    } catch (error) {
+      res.send(error);
+    }
+  },
+};
 
-    persistance.updateDB("users.json", user);
-    
-    res.status(200).json({
-      msg: "Carrito modificado",
-      user: id,
-      cart: user.cart,
-    });
-  } else {
-    res.status(404).json({ msg: `Usuario con id ${id} no fue encontrado` });
-  }
-}
-
-module.exports = { getCarrito, putCarrito };
+module.exports = cartController;
