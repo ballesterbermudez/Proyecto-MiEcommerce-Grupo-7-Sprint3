@@ -77,7 +77,7 @@ const usersController = {
       //     msg: `El usuario con id ${req.body.id} ya existe`,
       //   });
       //   //CHECK SI EL ROLE EXISTE
-      // } else 
+      // } else
       if (!(await persistance.searchById("Role", req.body.id_role))) {
         console.log(req.body.role);
         res.status(412).json({
@@ -129,7 +129,9 @@ const usersController = {
         });
         res.status(401).json({ ok: false, msg: errorArray });
       } else {
-        res.status(500).json({ ok: false,msg: "No fue posible crear el usuario" });
+        res
+          .status(500)
+          .json({ ok: false, msg: "No fue posible crear el usuario" });
       }
     }
   },
@@ -141,7 +143,7 @@ const usersController = {
         req.params.userId
       );
       const { id_role } = req.body;
-      //CHEQUEO SI TIENE ROLE Y Q EXISTA EN LA TABLA ROLE 
+      //CHEQUEO SI TIENE ROLE Y Q EXISTA EN LA TABLA ROLE
       if (
         id_role !== undefined &&
         !(await persistance.searchById("Role", id_role))
@@ -182,11 +184,19 @@ const usersController = {
         });
       }
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        ok: false,
-        msg: "Error al leer la base de datos",
-      });
+      if (error instanceof ValidationError) {
+        let errorArray = [];
+        error.errors.forEach((el, i) => {
+          errorArray[i] = el.message;
+        });
+        res.status(401).json({ ok: false, msg: errorArray });
+      } else {
+        console.log(error);
+        res.status(500).json({
+          ok: false,
+          msg: "Error al leer la base de datos",
+        });
+      }
     }
   },
   //HACER UPDATE CON BORRAR CARRITO ANTES DE BORRAR USER
