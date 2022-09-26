@@ -1,5 +1,6 @@
 const persistence = require("../persistence/persistence");
 const { ValidationError } = require("sequelize");
+const {Product} = require('../database/models');
 
 const categoryController = {
     listCategorys: async (req, res) => {
@@ -18,7 +19,7 @@ const categoryController = {
     detailCategory: async (req, res) => {
         try {
             let category = await persistence.searchByCriteria("Category", {
-                include: { association: "product_category" },
+                include: { association: "product_category" , include: { association: 'galery', limit: 1}},
                 attributes: ["title"],
                 where: { id: req.params.id },
             });
@@ -89,7 +90,7 @@ const categoryController = {
                 res.status(401).json(errorArray);
             } else {
                 res.status(500).json({
-                    message: "No fue posible insertar el producto",
+                    message: "No fue posible modificar el producto",
                 });
             }
         }
@@ -107,7 +108,7 @@ const categoryController = {
             } else {
                 res.status(404).json("no se encontro la category");
             }
-        } catch (eror) {
+        } catch (error) {
             if (error instanceof ValidationError) {
                 let errorArray = [];
                 error.errors.forEach((el, i) => {
@@ -116,7 +117,7 @@ const categoryController = {
                 res.status(401).json(errorArray);
             } else {
                 res.status(500).json({
-                    message: "No fue posible insertar el producto",
+                    message: "No fue posible borrar el producto",
                 });
             }
         }
