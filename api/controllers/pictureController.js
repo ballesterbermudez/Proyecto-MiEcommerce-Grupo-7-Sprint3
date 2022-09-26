@@ -1,4 +1,3 @@
-const path = require("path");
 const persistence = require("../persistence/persistence");
 const { ValidationError } = require('sequelize');
 
@@ -102,7 +101,7 @@ const pictureController = {
         res.status(400).json("debe ingresar un id");
       }
       let picture = await persistence.searchById("Picture", id);
-      if (picture != null) {
+      if (picture) {
         await persistence.delete('Picture', req.params.id);
         res.status(200).json(picture);
       } else {

@@ -12,7 +12,14 @@ module.exports = function(sequelize, DataTypes) {
     title: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      unique: "title"
+      unique: "title",
+      validate: {
+        notNull: { msg: "El title es requerido"},
+        isAlpha: {
+          args: true,
+          msg: "El titulo solo debe contener letras"
+        }
+      }
     }
   } 
 
