@@ -1,4 +1,6 @@
-const persistence = require('../persistence/persistence')
+const persistence = require('../persistence/persistence');
+const db = require('../database/models');
+
 
 
 const userConverter = (user) => {
@@ -17,14 +19,16 @@ const userConverter = (user) => {
   }
   return null;
 };
-// ---------------------------------------------------------------------
+
 
 const roles = ["GUEST", "ADMIN", "GOD"];
-const usersController = {
-  listUsers: (req, res) => {
-    try {
-      const users = persistence.readDB("users.json");
+// ---------------------------------------------------------------------
 
+const usersController = {
+  listUsers: async (req, res) => {
+    try {
+      //const users = persistence.readDB("users.json");
+      const users = await User.findAll();
       const usersDT = users.map((ele) => userConverter(ele));
       res.status(200).json({
         ok: true,

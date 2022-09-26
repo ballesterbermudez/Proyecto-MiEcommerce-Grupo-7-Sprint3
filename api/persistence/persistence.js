@@ -5,7 +5,7 @@ const db = require('../database/models')
 
 const persistence = {
   
-    searchBYUsername: async (username, password) => {
+  searchBYUsername: async (username, password) => {
 
       try{
           const user = await db.User.findOne({
@@ -67,6 +67,8 @@ const persistence = {
     }
   },
 
+  
+
   inster: async (modelName, datos) => {
 
     try {
@@ -109,7 +111,7 @@ const persistence = {
           [db.Sequelize.Op.or]: [
             { description: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
             {title: {[db.Sequelize.Op.like] : "%"+keyWord+"%"}},
-             db.Sequelize.or(db.Sequelize.col('category_product.title'),  'lacteos') 
+             db.Sequelize.where(db.Sequelize.col('category_product.title'), {[db.Sequelize.Op.like] : "%"+keyWord+"%"}) 
             ],
             
           }
@@ -124,6 +126,30 @@ const persistence = {
       throw new Error("Error acceso a bd")
     }
   },
+
+  getCartByUserID: async (id) => {
+
+    try{
+      const cart =  await db.User.findByPk(id, {
+        include: {
+          model: db.Product,
+          as: "cart",
+          through: { attributes: ["quantity", "date"] },
+          attributes: ["title"],
+        },
+        //attributes: [db.Sequelize.col('cart')]
+        attributes: {exclude: ["email", "password", "username", "first_name", "last_name", "profilepic", "id_role"]}
+
+      })
+
+      return cart;
+
+    }catch(Error){
+      throw new Error("Error acceso a bd")
+    }
+
+  }
+
 
 }
  
