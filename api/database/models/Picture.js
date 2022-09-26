@@ -5,12 +5,22 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      validate: {
+        isInt: { msg: "El id debe ser un entero" },
+      }
     },
     url: {
       type: DataTypes.STRING(255),
       allowNull: false,
-      unique: "url"
+      unique: "url",
+      validate: {
+        notNull: { msg: "El Url es requerido"},
+        isUrl: {
+          args: true,
+          msg: 'debe ingresar una url',
+        }
+      }
     },
     description: {
       type: DataTypes.STRING(100),

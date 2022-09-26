@@ -1,5 +1,6 @@
 const path = require("path");
 const persistence = require("../persistence/persistence");
+const { ValidationError } = require('sequelize');
 
 const pictureController = {
   listPictures: async (req, res) => {
@@ -51,8 +52,15 @@ const pictureController = {
       await persistence.inster("Picture", picture);
       res.status(200).json(picture);
     } catch (error) {
-      console.log(error);
-      res.status(500).json("No se pudo acceder a la informacion");
+        if( error instanceof ValidationError)
+        {
+            let errorArray = []
+            error.errors.forEach((el,i) => {errorArray[i] = el.message})
+            res.status(401).json(errorArray)
+        }
+        else{
+            res.status(500).json({message: "No fue posible insertar el producto"});
+        }
     }
   },
   editPicture: async (req, res) => {
@@ -76,8 +84,15 @@ const pictureController = {
         res.status(404).json('picture no encontrada')
         }
     } catch (error) {
-      console.log(error);
-      res.status(500).json("No se pudo acceder a la informacion");
+        if( error instanceof ValidationError)
+        {
+            let errorArray = []
+            error.errors.forEach((el,i) => {errorArray[i] = el.message})
+            res.status(401).json(errorArray)
+        }
+        else{
+            res.status(500).json({message: "No fue posible insertar el producto"});
+        }
     }
   },
   deletePicture: async (req, res) => {
@@ -94,8 +109,8 @@ const pictureController = {
         res.status(404).json('no se encontro la picture');
       }
     } catch (error) {
-      console.log(error);
-      res.status(500).json('no se pudo acceder a la informacion');
+        console.log(error);
+        res.status(500).json("No se pudo acceder a la informacion");
     }
   },
   getPicture: async (id) => {
