@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 
+
 module.exports = function (sequelize, DataTypes) {
   const cols = {
     id: {
@@ -24,9 +25,15 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       unique: true,
       validate: {
-        is: {
-          args: /^[a-z]+$/i,
-          msg: "El username debe ser un string",
+        isStr(data){
+          if (!(typeof data === 'string')) {
+            throw new Error('El username debe ser un string');
+          }
+        },
+        isOnlyNums(data){
+          if ((Number(data))) {
+            throw new Error('El username debe contener al menos un caracter');
+          }
         },
         min: { args: 4, msg: "El username debe tener 4 caracteres minimo" },
       }
@@ -73,6 +80,8 @@ module.exports = function (sequelize, DataTypes) {
     tableName: "users",
     timestamps: false,
   };
+
+ 
 
   const User = sequelize.define("User", cols, extras);
 
