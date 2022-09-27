@@ -14,7 +14,7 @@ const userConverter = (user) => {
       username: user.username,
       first_name: user.first_name,
       last_name: user.last_name,
-      profilepic: user.profilepic
+      profilepic: user.profilepic,
     };
     return userDT;
   }
@@ -29,13 +29,12 @@ const userRolConverter = (user) => {
       first_name: user.first_name,
       last_name: user.last_name,
       profilepic: user.profilepi,
-      role_data: user.userrole
+      role_data: user.userrole,
     };
     return userDT;
   }
   return null;
 };
-
 
 const usersController = {
   listUsers: async (req, res) => {
@@ -65,10 +64,10 @@ const usersController = {
         include: ["userrole"],
         where: { id: req.params.userId },
       });
-      console.log(user)
+      console.log(user);
       if (user) {
         //PASO EL USUARIO A USUARIODT PARA MOSTRAR SIN LA PASS
-       userDT = userRolConverter(user[0]);
+        userDT = userRolConverter(user[0]);
         res.status(200).json({
           ok: true,
           msg: "Usuario obtenido correctamente",
@@ -230,6 +229,27 @@ const usersController = {
       );
       //CHEQUEO SI EXISTE EL USER
       if (userToDelete) {
+        //BORRO EL CARRITO DEL USER
+        const user = await persistance.getCartByUserID(req.params.userId);
+        const cart = user.cart;
+
+        for (let i = 0; i < cart.length; i++) {
+          const producto = await persistance.searchById(
+            "Product",
+            cart[i].Cart.id_product
+          );
+          const nuevoStock = producto.stock + cart[i].Cart.quantity;
+          await persistance.updateData(
+            "Product",
+            producto.id,
+            {
+              stock: nuevoStock,
+            },
+            t
+          );
+          await persistance.deleteOneProduct(req.params.id, producto.id, t);
+        }
+
         //ELIMINO DE LA BASE DE DATOS EL USUARIO CON EL ID DE PARAM
         persistance.delete("User", userToDelete.id);
         //PASO EL USER BORRADO A USUARIODT PARA MOSTRAR SIN LA PASS
