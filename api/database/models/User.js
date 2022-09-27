@@ -15,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      unique: {args: true, msg: "El email ya esta registrado en la base de datos"},
       validate: {
         isEmail: { msg: "Ingrese un email correcto" },
       }
@@ -23,7 +23,7 @@ module.exports = function (sequelize, DataTypes) {
     username: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      unique: true,
+      unique: {args: true, msg: "El username ya esta registrado en la base de datos"},
       validate: {
         isStr(data){
           if (!(typeof data === 'string')) {
