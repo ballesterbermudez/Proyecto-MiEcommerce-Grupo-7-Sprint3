@@ -41,8 +41,8 @@ const persistence = {
   updateData: async (modelName, id, datos, transaction = null) => {
     try {
       await db[modelName].update(datos, {
-        where: { id: id },
-      },transaction);
+        where: { id: id }, transaction: transaction
+      });
     } catch (error) {
       throw error;
     }
@@ -59,8 +59,8 @@ const persistence = {
   deleteOneProduct: async (userId, productId, transaction = null) => {
     try {
       await db.Cart.destroy({
-        where: { id_product: productId, id_usuario: userId },
-      }, transaction);
+        where: { id_product: productId, id_usuario: userId }, transaction: transaction
+      });
     } catch (error) {
       throw error;
     }
