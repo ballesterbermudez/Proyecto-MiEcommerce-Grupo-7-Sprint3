@@ -70,9 +70,11 @@ const persistence = {
     }
   },
 
-  deleteCartByUserId: async (userId) => {
+  deleteOneProduct: async (userId, productId) => {
     try {
-      await db.Cart.destroy({ where: { id_usuario: userId } });
+      await db.Cart.destroy({
+        where: { id_product: productId, id_usuario: userId },
+      });
     } catch (error) {
       throw error;
     }

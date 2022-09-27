@@ -5,6 +5,6 @@ const validateUserId = require("../middelware/validateUserId");
 const validateProducts = require("../middelware/validateProducts");
 
 router.get("/:id", validateUserId, cartController.listCart);
-router.put("/:id", validateUserId, validateProducts, cartController.modifyCart);
+router.put("/:id", validateUserId, cartController.modifyCart);
 
 module.exports = router;

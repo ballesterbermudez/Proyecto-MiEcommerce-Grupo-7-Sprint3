@@ -1,5 +1,6 @@
 const persistance = require("../persistence/persistence");
-const { ValidationError } = require("sequelize");
+const { ValidationError, Transaction } = require("sequelize");
+const { sequelize } = require("../database/models");
 
 // FUNCION AUXILIAR
 // PRE: Recibe el id del carrito
@@ -39,6 +40,61 @@ const cartController = {
   },
   modifyCart: async (req, res) => {
     try {
+      const user = await persistance.getCartByUserID(req.params.id);
+      const cart = user.cart;
+
+      //PRIMER FOR:
+      //Destruir carrito antiguo.
+      for (let i = 0; i < cart.length; i++) {
+        const producto = await persistance.searchById(
+          "Product",
+          cart[i].Cart.id_product
+        );
+        const nuevoStock = producto.stock + cart[i].Cart.quantity;
+        await persistance.updateData("Product", producto.id, {
+          stock: nuevoStock,
+        });
+        await persistance.deleteOneProduct(req.params.id, producto.id);
+      }
+
+      //SEGUNDO FOR:
+      //Crear nuevo carrito.
+      const nuevoCart = req.body;
+      for (let i = 0; i < nuevoCart.length; i++) {
+        const producto = await persistance.searchById(
+          "Product",
+          nuevoCart[i].id_product
+        );
+        let nuevoStock = producto.stock;
+        let quantity = 0;
+        if (nuevoCart[i].quantity) {
+          nuevoStock = nuevoStock - nuevoCart[i].quantity;
+          quantity = nuevoCart[i].quantity;
+        } else {
+          nuevoStock = nuevoStock - 1;
+          quantity = 1;
+        }
+        await persistance.updateData("Product", producto.id, {
+          stock: nuevoStock,
+        });
+        const data = {
+          id_product: producto.id,
+          id_usuario: req.params.id,
+          quantity: quantity,
+        };
+        await persistance.inster("Cart", data);
+      }
+
+      const cartById = await persistance.getCartByUserID(req.params.id);
+      res.status(200).json({ ok: true, newCart: cartById });
+    } catch (error) {
+      console.log(error.message);
+      res.status(500).json(error);
+    }
+  },
+
+  modifyCartAux: async (req, res) => {
+    try {
       await sumarQuantityCartAStock(req.params.id);
       await persistance.deleteCartByUserId(req.params.id);
 
@@ -66,6 +122,7 @@ const cartController = {
       }
       const modifiedCart = await persistance.getCartByUserID(req.params.id);
       //console.log(modifiedCart);
+
       res.status(200).json({
         msg: "Carrito modificado",
         modifiedCart,
