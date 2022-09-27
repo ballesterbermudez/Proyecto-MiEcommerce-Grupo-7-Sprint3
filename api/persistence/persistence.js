@@ -1,4 +1,4 @@
-const { Op } = require("sequelize");
+
 const db = require("../database/models");
 
 const persistence = {
@@ -36,33 +36,19 @@ const persistence = {
     }
   },
 
-  // searchAll: async (modelName) => {
-  //   try {
-  //     const user = await db.User.findOne({
-  //       attributes: ["id", "username"],
-  //       where: { username: username, password: password },
-  //       include: {
-  //         association: "userrole",
-  //         attributes: ["role"],
-  //       },
-  //     });
-  //     return user;
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // },
 
-  updateData: async (modelName, id, datos) => {
+
+  updateData: async (modelName, id, datos, transaction = null) => {
     try {
       await db[modelName].update(datos, {
         where: { id: id },
-      });
+      },transaction);
     } catch (error) {
       throw error;
     }
   },
 
-  delete: async (modelName, id) => {
+  delete: async (modelName, id, ) => {
     try {
       await db[modelName].destroy({ where: { id: id } });
     } catch (error) {
@@ -70,19 +56,19 @@ const persistence = {
     }
   },
 
-  deleteOneProduct: async (userId, productId) => {
+  deleteOneProduct: async (userId, productId, transaction = null) => {
     try {
       await db.Cart.destroy({
         where: { id_product: productId, id_usuario: userId },
-      });
+      }, transaction);
     } catch (error) {
       throw error;
     }
   },
 
-  inster: async (modelName, datos) => {
+  inster: async (modelName, datos, transaction = null) => {
     try {
-      const newData = await db[modelName].create(datos);
+      const newData = await db[modelName].create(datos,transaction);
       return newData;
     } catch (error) {
       throw error;
