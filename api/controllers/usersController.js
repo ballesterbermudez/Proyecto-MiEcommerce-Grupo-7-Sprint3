@@ -14,12 +14,28 @@ const userConverter = (user) => {
       username: user.username,
       first_name: user.first_name,
       last_name: user.last_name,
-      profilepic: user.profilepic,
+      profilepic: user.profilepic
     };
     return userDT;
   }
   return null;
 };
+const userRolConverter = (user) => {
+  if (user) {
+    const userDT = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      profilepic: user.profilepi,
+      role_data: user.userrole
+    };
+    return userDT;
+  }
+  return null;
+};
+
 
 const usersController = {
   listUsers: async (req, res) => {
@@ -44,14 +60,19 @@ const usersController = {
   findUserById: async (req, res) => {
     try {
       //BUSCO EL USUARIO CON EL ID DEL PARAM Y CHEQUEO SI EXISTE
-      const user = await persistance.searchById("User", req.params.userId);
+      // const user = await persistance.searchById("User", req.params.userId);
+      const user = await persistance.searchByCriteria("User", {
+        include: ["userrole"],
+        where: { id: req.params.userId },
+      });
+      console.log(user)
       if (user) {
         //PASO EL USUARIO A USUARIODT PARA MOSTRAR SIN LA PASS
-        const userDT = userConverter(user);
+       userDT = userRolConverter(user[0]);
         res.status(200).json({
           ok: true,
           msg: "Usuario obtenido correctamente",
-          users: userDT,
+          user: userDT,
         });
       } else {
         res.status(401).json({
