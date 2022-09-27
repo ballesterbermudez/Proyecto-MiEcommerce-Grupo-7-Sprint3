@@ -31,7 +31,11 @@ const controller = {
                     }
                 const data = await persistence.searchByCriteria("Category",criteria);
                 
-                resp.status(200).json(data);
+                if(data.length > 0) {
+                    resp.status(200).json(data)
+                } else {
+                    resp.status(404).json({message: "No hubieron resultados"});
+                }
                 
             }
             else
