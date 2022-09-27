@@ -105,7 +105,7 @@ const persistence = {
           association: "category_product",
           attributes: ["title"],
         },
-        include: {association: 'galery', limit: 1 },
+        include: { association: "galery", limit: 1 },
         where: {
           [db.Sequelize.Op.or]: [
             { description: { [db.Sequelize.Op.like]: "%" + keyWord + "%" } },
@@ -128,7 +128,7 @@ const persistence = {
         include: {
           model: db.Product,
           as: "cart",
-          through: { attributes: ["quantity", "date"] },
+          through: { attributes: ["id_product", "quantity", "date"] },
           attributes: ["title"],
         },
         //attributes: [db.Sequelize.col('cart')]
