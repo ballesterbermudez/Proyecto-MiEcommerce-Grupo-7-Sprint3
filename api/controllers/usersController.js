@@ -14,12 +14,28 @@ const userConverter = (user) => {
       username: user.username,
       first_name: user.first_name,
       last_name: user.last_name,
-      profilepic: user.profilepic,
+      profilepic: user.profilepic
     };
     return userDT;
   }
   return null;
 };
+const userRolConverter = (user) => {
+  if (user) {
+    const userDT = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      profilepic: user.profilepi,
+      role_data: user.userrole
+    };
+    return userDT;
+  }
+  return null;
+};
+
 
 const usersController = {
   listUsers: async (req, res) => {
@@ -44,14 +60,19 @@ const usersController = {
   findUserById: async (req, res) => {
     try {
       //BUSCO EL USUARIO CON EL ID DEL PARAM Y CHEQUEO SI EXISTE
-      const user = await persistance.searchById("User", req.params.userId);
+      // const user = await persistance.searchById("User", req.params.userId);
+      const user = await persistance.searchByCriteria("User", {
+        include: ["userrole"],
+        where: { id: req.params.userId },
+      });
+      console.log(user)
       if (user) {
         //PASO EL USUARIO A USUARIODT PARA MOSTRAR SIN LA PASS
-        const userDT = userConverter(user);
+       userDT = userRolConverter(user[0]);
         res.status(200).json({
           ok: true,
           msg: "Usuario obtenido correctamente",
-          users: userDT,
+          user: userDT,
         });
       } else {
         res.status(401).json({
@@ -77,7 +98,7 @@ const usersController = {
       //     msg: `El usuario con id ${req.body.id} ya existe`,
       //   });
       //   //CHECK SI EL ROLE EXISTE
-      // } else 
+      // } else
       if (!(await persistance.searchById("Role", req.body.id_role))) {
         console.log(req.body.role);
         res.status(412).json({
@@ -129,7 +150,9 @@ const usersController = {
         });
         res.status(401).json({ ok: false, msg: errorArray });
       } else {
-        res.status(500).json({ ok: false,msg: "No fue posible crear el usuario" });
+        res
+          .status(500)
+          .json({ ok: false, msg: "No fue posible crear el usuario" });
       }
     }
   },
@@ -141,7 +164,7 @@ const usersController = {
         req.params.userId
       );
       const { id_role } = req.body;
-      //CHEQUEO SI TIENE ROLE Y Q EXISTA EN LA TABLA ROLE 
+      //CHEQUEO SI TIENE ROLE Y Q EXISTA EN LA TABLA ROLE
       if (
         id_role !== undefined &&
         !(await persistance.searchById("Role", id_role))
@@ -182,11 +205,19 @@ const usersController = {
         });
       }
     } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        ok: false,
-        msg: "Error al leer la base de datos",
-      });
+      if (error instanceof ValidationError) {
+        let errorArray = [];
+        error.errors.forEach((el, i) => {
+          errorArray[i] = el.message;
+        });
+        res.status(401).json({ ok: false, msg: errorArray });
+      } else {
+        console.log(error);
+        res.status(500).json({
+          ok: false,
+          msg: "Error al leer la base de datos",
+        });
+      }
     }
   },
   //HACER UPDATE CON BORRAR CARRITO ANTES DE BORRAR USER

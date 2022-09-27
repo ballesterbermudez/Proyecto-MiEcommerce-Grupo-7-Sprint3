@@ -103,11 +103,15 @@ const persistence = {
   searchByKeyword: async (keyWord) => {
     try {
       const respuesta = await db.Product.findAll({
-        include: {
+        
+        include: [{
           association: "category_product",
           attributes: ["title"],
         },
-        include: { association: "galery", limit: 1 },
+        {
+          association: "galery",
+          limit: 1
+        }],
         where: {
           [db.Sequelize.Op.or]: [
             { description: { [db.Sequelize.Op.like]: "%" + keyWord + "%" } },
@@ -116,7 +120,7 @@ const persistence = {
               [db.Sequelize.Op.like]: "%" + keyWord + "%",
             }),
           ],
-        },
+        }
       });
       return respuesta;
     } catch (error) {
