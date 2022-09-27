@@ -43,8 +43,8 @@ const cartController = {
           const nuevoStock = producto.stock + cart[i].Cart.quantity;
           await persistance.updateData("Product", producto.id, {
             stock: nuevoStock,
-          }, {transction: t});
-          await persistance.deleteOneProduct(req.params.id, producto.id,{transction: t});
+          }, {transaction: t});
+          await persistance.deleteOneProduct(req.params.id, producto.id,{transaction: t});
         }
 
         //SEGUNDO FOR:
@@ -66,13 +66,13 @@ const cartController = {
           }
           await persistance.updateData("Product", producto.id, {
             stock: nuevoStock,
-          },{transction: t});
+          },{transaction: t});
           const data = {
             id_product: producto.id,
             id_usuario: req.params.id,
             quantity: quantity,
           };
-          await persistance.inster("Cart", data,{transction: t});
+          await persistance.inster("Cart", data,{transaction: t});
         }
 
         const cartById = await persistance.getCartByUserID(req.params.id);
