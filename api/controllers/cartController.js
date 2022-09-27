@@ -30,79 +30,68 @@ const cartController = {
    
     try {
 
+        const user = await persistance.getCartByUserID(req.params.id);
+        const cart = user.cart;
+
         //PRIMER FOR:
         //Destruir carrito antiguo.
-         await destroyCart(req.params.id, t);
+        for (let i = 0; i < cart.length; i++) {
+          const producto = await persistance.searchById(
+            "Product",
+            cart[i].Cart.id_product
+          );
+          const nuevoStock = producto.stock + cart[i].Cart.quantity;
+          await persistance.updateData("Product", producto.id, {
+            stock: nuevoStock,
+          }, t);
+          await persistance.deleteOneProduct(req.params.id, producto.id, t);
+        }
 
         //SEGUNDO FOR:
         //Crear nuevo carrito.
         const nuevoCart = req.body;
-       await createNewCart(nuevoCart,req.params.id,t)
+        for (let i = 0; i < nuevoCart.length; i++) {
+          const producto = await persistance.searchById(
+            "Product",
+            nuevoCart[i].id_product
+          );
+          let nuevoStock = producto.stock;
+          let quantity = 0;
+          if (nuevoCart[i].quantity) {
+            nuevoStock = nuevoStock - nuevoCart[i].quantity;
+            quantity = nuevoCart[i].quantity;
+          } else {
+            nuevoStock = nuevoStock - 1;
+            quantity = 1;
+          }
+          await persistance.updateData("Product", producto.id, {
+            stock: nuevoStock,
+          },t);
+          const data = {
+            id_product: producto.id,
+            id_usuario: req.params.id,
+            quantity: quantity,
+          };
+          await persistance.inster("Cart", data,{transaction: t});
+          console.log("iteracion: " + i)
+        }
+
+        await t.commit();
 
         const cartById = await persistance.getCartByUserID(req.params.id);
         
-        await t.commit();
+        
     
       res.status(200).json({ ok: true, newCart: cartById });
     } catch (error) {
-      await t.rollback();
+      await  t.rollback();
       res.status(500).json({
         ok: false,
         msg: "Error interno del server"
       })
     }
   },
-  
-  //Prerrequisito, cart no puede estar vacio
-  destroyCart: async (idUser, transaction = null) => {
 
-    const user = await persistance.getCartByUserID(idUser);
-    const cart = user.cart;
-    if(cart)
-      {
-      for (let i = 0; i < cart.length; i++) {
-        const producto = await persistance.searchById(
-          "Product",
-          cart[i].Cart.id_product
-        );
-        const nuevoStock = producto.stock + cart[i].Cart.quantity;
-        await persistance.updateData("Product", producto.id, {
-          stock: nuevoStock,
-        }, {transaction: transaction});
-        await persistance.deleteOneProduct(req.params.id, producto.id,{transaction: transaction});
-      }
-
-    }
-  },
-
-  createNewCart: async (nuevoCart, userId, transaction = null) => {
-
-    for (let i = 0; i < nuevoCart.length; i++) {
-      const producto = await persistance.searchById(
-        "Product",
-        nuevoCart[i].id_product
-      );
-      let nuevoStock = producto.stock;
-      let quantity = 0;
-      if (nuevoCart[i].quantity) {
-        nuevoStock = nuevoStock - nuevoCart[i].quantity;
-        quantity = nuevoCart[i].quantity;
-      } else {
-        nuevoStock = nuevoStock - 1;
-        quantity = 1;
-      }
-      await persistance.updateData("Product", producto.id, {
-        stock: nuevoStock,
-      },{transaction: transaction});
-      const data = {
-        id_product: producto.id,
-        id_usuario: userId,
-        quantity: quantity,
-      };
-      await persistance.inster("Cart", data,{transaction: transaction});
-    }
-
-  }
 };
 
 module.exports = cartController;
