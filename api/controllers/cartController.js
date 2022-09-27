@@ -43,8 +43,10 @@ const cartController = {
           const nuevoStock = producto.stock + cart[i].Cart.quantity;
           await persistance.updateData("Product", producto.id, {
             stock: nuevoStock,
+
           }, t);
           await persistance.deleteOneProduct(req.params.id, producto.id, t);
+
         }
 
         //SEGUNDO FOR:
@@ -66,17 +68,21 @@ const cartController = {
           }
           await persistance.updateData("Product", producto.id, {
             stock: nuevoStock,
+
           },t);
+
           const data = {
             id_product: producto.id,
             id_usuario: req.params.id,
             quantity: quantity,
           };
           await persistance.inster("Cart", data,{transaction: t});
+
           console.log("iteracion: " + i)
         }
 
         await t.commit();
+
 
         const cartById = await persistance.getCartByUserID(req.params.id);
         
@@ -84,7 +90,9 @@ const cartController = {
     
       res.status(200).json({ ok: true, newCart: cartById });
     } catch (error) {
+
       await  t.rollback();
+
       res.status(500).json({
         ok: false,
         msg: "Error interno del server"
