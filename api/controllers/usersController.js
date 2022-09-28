@@ -65,9 +65,9 @@ const usersController = {
         where: { id: req.params.userId },
       });
       console.log(user);
-      if (user) {
+      if (user.length > 0) {
         //PASO EL USUARIO A USUARIODT PARA MOSTRAR SIN LA PASS
-        userDT = userRolConverter(user[0]);
+        let userDT = userRolConverter(user[0]);
         res.status(200).json({
           ok: true,
           msg: "Usuario obtenido correctamente",
