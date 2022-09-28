@@ -245,9 +245,8 @@ const usersController = {
             {
               stock: nuevoStock,
             },
-            t
           );
-          await persistance.deleteOneProduct(req.params.id, producto.id, t);
+          await persistance.deleteOneProduct(req.params.userId, producto.id);
         }
 
         //ELIMINO DE LA BASE DE DATOS EL USUARIO CON EL ID DE PARAM
