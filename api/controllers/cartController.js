@@ -27,74 +27,14 @@ const cartController = {
         let t = await sequelize.transaction();
 
         try {
-            const user = await persistance.getCartByUserID(req.params.id);
-            const cart = user.cart;
-            let antiguoCart = [];
-            //PRIMER FOR:
-            //Destruir carrito antiguo.
-            for (let i = 0; i < cart.length; i++) {
-                const producto = await persistance.searchById(
-                    "Product",
-                    cart[i].Cart.id_product
-                );
-                const nuevoStock = producto.stock + cart[i].Cart.quantity;
-                antiguoCart[i] = { id: producto.id, stock: nuevoStock };
-                await persistance.updateData(
-                    "Product",
-                    producto.id,
-                    {
-                        stock: nuevoStock,
-                    },
-                    t
-                );
-                await persistance.deleteOneProduct(
-                    req.params.id,
-                    producto.id,
-                    t
-                );
-            }
-
-            //SEGUNDO FOR:
+           
+          //borramos el antiguo cart
+            let antiguoCart = await deleteCart(req.params.id, t)
+            
+            
             //Crear nuevo carrito.
             const nuevoCart = req.body;
-            for (let i = 0; i < nuevoCart.length; i++) {
-                let producto = antiguoCart.find(
-                    (ele) => ele.id == nuevoCart[i].id_product
-                );
-                if (!producto) {
-                    producto = await persistance.searchById(
-                        "Product",
-                        nuevoCart[i].id_product
-                    );
-                }
-                let nuevoStock = producto.stock;
-                let quantity = 0;
-
-                if (nuevoCart[i].quantity) {
-                    nuevoStock = nuevoStock - nuevoCart[i].quantity;
-                    quantity = nuevoCart[i].quantity;
-                } else {
-                    nuevoStock = nuevoStock - 1;
-                    quantity = 1;
-                }
-                await persistance.updateData(
-                    "Product",
-                    producto.id,
-                    {
-                        stock: nuevoStock,
-                    },
-                    t
-                );
-
-                const data = {
-                    id_product: producto.id,
-                    id_usuario: req.params.id,
-                    quantity: quantity,
-                };
-                await persistance.inster("Cart", data, { transaction: t });
-
-                console.log("iteracion: " + i);
-            }
+            await this.createNewCart(req.params.id, nuevoCart,antiguoCart,t)
 
             await t.commit();
 
@@ -116,6 +56,85 @@ const cartController = {
             }
         }
     },
+
+    deleteCart: async (id, transaction = null) => {
+
+
+            const user = await persistance.getCartByUserID(id);
+            const cart = user.cart;
+            let antiguoCart = [];
+           
+            for (let i = 0; i < cart.length; i++) {
+                const producto = await persistance.searchById(
+                    "Product",
+                    cart[i].Cart.id_product
+                );
+                const nuevoStock = producto.stock + cart[i].Cart.quantity;
+                antiguoCart[i] = { id: producto.id, stock: nuevoStock };
+                await persistance.updateData(
+                    "Product",
+                    producto.id,
+                    {
+                        stock: nuevoStock,
+                    },
+                    transaction
+                );
+                await persistance.deleteOneProduct(
+                    id,
+                    producto.id,
+                    transaction
+                );
+            }
+      
+
+      return antiguoCart
+    },
+
+    createNewCart: async (id,nuevoCart, antiguoCart,transaction = null) => {
+
+
+      for (let i = 0; i < nuevoCart.length; i++) {
+        let producto = antiguoCart.find(
+            (ele) => ele.id == nuevoCart[i].id_product
+        );
+        if (!producto) {
+            producto = await persistance.searchById(
+                "Product",
+                nuevoCart[i].id_product
+            );
+        }
+        let nuevoStock = producto.stock;
+        let quantity = 0;
+
+        if (nuevoCart[i].quantity) {
+            nuevoStock = nuevoStock - nuevoCart[i].quantity;
+            quantity = nuevoCart[i].quantity;
+        } else {
+            nuevoStock = nuevoStock - 1;
+            quantity = 1;
+        }
+        await persistance.updateData(
+            "Product",
+            producto.id,
+            {
+                stock: nuevoStock,
+            },
+            transaction
+        );
+
+        const data = {
+            id_product: producto.id,
+            id_usuario: id,
+            quantity: quantity,
+        };
+        await persistance.inster("Cart", data, { transaction: transaction});
+
+        console.log("iteracion: " + i);
+    }
+
+    },
+
+
 };
 
 module.exports = cartController;
