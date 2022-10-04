@@ -42,7 +42,7 @@ app.use("/api/v1/category", verifyJWT, routeCategory)
 
 // Server open
 
-app.listen(process.env.PORT, async () => {
+const server = app.listen(process.env.PORT, async () => {
   try {
     await db.sequelize.authenticate();
     console.log("Connection has been established successfully.");
@@ -55,5 +55,7 @@ app.listen(process.env.PORT, async () => {
 // Redireccionamiento de pagina
 
 app.get("*", (req, res) => {
-  res.redirect("/api/v1");
+  res.status(200).redirect("/api/v1");
 });
+
+module.exports = {app, server}
