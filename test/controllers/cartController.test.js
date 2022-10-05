@@ -27,7 +27,20 @@ describe("GET /api/v1/carts/", () => {
       .auth(jwt, { type: "bearer" });
     expect(statusCode).toBe(200);
   });
+  test("debe devolver status 404 si el id no se corresponde con ningun user", async () => {
+    const idUser = 9999;
 
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { statusCode } = await request(app)
+      .get("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" });
+    expect(statusCode).toBe(404);
+  });
   test("debe devolver un objeto json", async () => {
     let id = 3;
     const payload = {
