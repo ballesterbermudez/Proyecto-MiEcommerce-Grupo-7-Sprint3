@@ -110,4 +110,5 @@ describe("POST /users", () => {
         .send(newUser);
       expect(statusCode).toBe(200);
     });
+    
   });
