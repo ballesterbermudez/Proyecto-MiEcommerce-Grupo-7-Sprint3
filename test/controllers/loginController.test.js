@@ -45,7 +45,8 @@ describe('POST /login', () => {
             username:'',
             password:''
         }
-     sinon.stub(persistance, "searchBYUsername").throws(
+     const a='searchBYUsername'
+     sinon.stub(persistance, a).throws(
            new Error({
              response: { status: 500},
            })
