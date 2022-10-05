@@ -61,6 +61,17 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
     expect(statusCode).toBe(200);
   });
 
+  test("Debe retornar un objeto usuario", async () => {
+    const userId = "1";
+    const token = await generateJWT(payload);
+    const { body } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(body.user).toEqual(
+      expect.objectContaining({ email: expect.any(String) })
+    );
+  });
+
   test("Debe retornar un statusCode 401", async () => {
     const userId = "999";
     const token = await generateJWT(payload);
@@ -78,17 +89,6 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
       .get(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(500);
-  });
-
-  test("Debe retornar un objeto usuario", async () => {
-    const userId = "1";
-    const token = await generateJWT(payload);
-    const { body } = await request(app)
-      .get(`/api/v1/users/${userId}`)
-      .auth(token, { type: "bearer" });
-    expect(body.user).toEqual(
-      expect.objectContaining({ email: expect.any(String) })
-    );
   });
 });
 
@@ -110,6 +110,26 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       .auth(token, { type: "bearer" })
       .send(newUser);
     expect(statusCode).toBe(200);
+  });
+
+  test.skip("Debe retornar un objeto usuario", async () => {
+    const newUser = {
+      email: "supertest1@cenco.com",
+      username: "jest1",
+      password: "123456",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const {body} = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(body.user).toEqual(
+      expect.objectContaining({ email: expect.any(String) })
+    );
   });
 
   test("Debe retornar un statusCode 412 por error en ROL", async () => {
@@ -157,7 +177,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       id_role: 1,
     };
     const token = await generateJWT(payload);
-    db.sequelize.close()
+    db.sequelize.close();
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -566,79 +586,96 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       .send(newUser);
     expect(statusCode).toBe(401);
   });
+});
 
-  describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
-    test("Debe retornar un statusCode 200", async () => {
-      const userId = 10;
-      const newUserData = {
-        email: "tessdt3@cenco.com",
-        username: "test23sd",
-        password: "testsd1234",
-        id_role: 2,
-      };
-      const token = await generateJWT(payload);
-      const { statusCode } = await request(app)
-        .put(`/api/v1/users/${userId}`)
-        .auth(token, { type: "bearer" })
-        .send(newUserData);
-      expect(statusCode).toBe(200);
-    });
-
-    test("Debe retornar un statusCode 412 por error en ROL", async () => {
-        const userId = 10;
-        const newUserData = {
-          email: "tessdt3@cenco.com",
-          username: "test23sd",
-          password: "testsd1234",
-          id_role: 999,
-        };
-        const token = await generateJWT(payload);
-        const { statusCode } = await request(app)
-          .put(`/api/v1/users/${userId}`)
-          .auth(token, { type: "bearer" })
-          .send(newUserData);
-        expect(statusCode).toBe(412);
-      });
-
-      test("Debe retornar un statusCode 404 no se encontro el usuario", async () => {
-        const userId = 999;
-        const newUserData = {
-          email: "tessdt3@cenco.com",
-          username: "test23sd",
-          password: "testsd1234",
-          id_role: 2,
-        };
-        const token = await generateJWT(payload);
-        const { statusCode } = await request(app)
-          .put(`/api/v1/users/${userId}`)
-          .auth(token, { type: "bearer" })
-          .send(newUserData);
-        expect(statusCode).toBe(404);
-      });
-
-      test("Debe retornar un statusCode 500 error en la base de datos", async () => {
-        const userId = 10;
-        const newUserData = {
-          email: "tessdt3@cenco.com",
-          username: "test23sd",
-          password: "testsd1234",
-          id_role: 2,
-        };
-        const token = await generateJWT(payload);
-        await db.sequelize.close();
-        const { statusCode } = await request(app)
-          .put(`/api/v1/users/${userId}`)
-          .auth(token, { type: "bearer" })
-          .send(newUserData);
-        expect(statusCode).toBe(500);
-      });
+//EDITAR USUARIO
+describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
+  test("Debe retornar un statusCode 200", async () => {
+    const userId = 10;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(200);
   });
 
-  
+  test("Debe retornar un objeto usuario", async () => {
+    const userId = 10;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payload);
+    const { body } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+      expect(body.user).toEqual(
+        expect.objectContaining({ email: expect.any(String) })
+      );  });
 
-  describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", () => {
-    test("msg", () => {
-      expect(200).toBe(200);
-    });
+  test("Debe retornar un statusCode 412 por error en ROL", async () => {
+    const userId = 10;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 999,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(412);
+  });
+
+  test("Debe retornar un statusCode 404 no se encontro el usuario", async () => {
+    const userId = 999;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(404);
+  });
+
+  test("Debe retornar un statusCode 500 error en la base de datos", async () => {
+    const userId = 10;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payload);
+    await db.sequelize.close();
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(500);
+  });
+});
+
+//ELIMINIAR USUARIO
+describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", () => {
+  test("msg", () => {
+    expect(200).toBe(200);
   });
 });
