@@ -146,9 +146,28 @@ describe("POST /users", () => {
     expect(statusCode).toBe(412);
   });
 
+  //VALIDATE ENEMAIL
   test("Debe retornar un statusCode 401 validate email unique", async () => {
     const newUser = {
       email: "diego@god.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate email no debe ser vacio", async () => {
+    const newUser = {
+      email: "",
       username: "jest",
       password: "123456",
       first_name: "El",
@@ -182,6 +201,7 @@ describe("POST /users", () => {
     expect(statusCode).toBe(401);
   });
 
+  //VALIDATES DE USERNAME
   test("Debe retornar un statusCode 401 validate username unique", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -272,6 +292,7 @@ describe("POST /users", () => {
     expect(statusCode).toBe(401);
   });
 
+  //VALIDATES DE PASSWORD
   test("Debe retornar un statusCode 401 validate password no es String", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -326,6 +347,7 @@ describe("POST /users", () => {
     expect(statusCode).toBe(401);
   });
 
+  //VALIDATES DE FIRST NAME
   test("Debe retornar un statusCode 401 validate firstname no es String", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -405,6 +427,97 @@ describe("POST /users", () => {
       password: "123456",
       first_name: "Abcdefghij-abcdefghij-abcdefghij-abcdefghij-abcdefghij",
       last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  //VALIDATES DE LAST NAME
+  test("Debe retornar un statusCode 401 validate lastname no es String", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: 7357,
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate lastname sin numeros", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "T3st3r",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate lastname no debe ser vacio", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate lastname menor a 2", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "T",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate lastname mayor a 50", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "Abcdefghij-abcdefghij-abcdefghij-abcdefghij-abcdefghij",
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
