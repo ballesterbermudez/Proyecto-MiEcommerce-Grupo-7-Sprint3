@@ -61,9 +61,6 @@ const controller = {
 
         try{
 
-
-            if(Number.isInteger(Number(req.params.id)))
-            {
                 const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}
                                   ,include: {association: 'galery'}, 
                                   where: {id: req.params.id} }
@@ -78,11 +75,7 @@ const controller = {
                 {
                     resp.status(404).json({message: "Producto no encontrado"});
                 }
-            }
-            else {
-                resp.status(401).json({message: "El id proporcionado no es un entero"})
-            }
-            
+              
 
          }catch(error){
             
@@ -127,8 +120,7 @@ const controller = {
 
             try{
 
-                if(Number.isInteger(Number(req.params.id)))
-                {
+                
                     let product = await persistence.searchById(modelName, req.params.id)
   
                     if(product != null)
@@ -155,10 +147,8 @@ const controller = {
                     {
                      resp.status(404).json({message: "Producto no encontrado"});
                     }
-                 }
-                else {
-                     resp.status(401).json({message: "El id proporcionado no es un entero"})
-                }
+                 
+                
  
             }catch(error){
                 if( error instanceof ValidationError)
