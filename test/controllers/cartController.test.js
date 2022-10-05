@@ -12,10 +12,9 @@ afterAll(async () => {
   await db.sequelize.close();
 });
 
-describe("GET /api/v1/carts/", () => {
+describe("GET /api/v1/carts/:id", () => {
   test("debe devolver status 200", async () => {
     const idUser = 1;
-
     const payload = {
       id: 1,
       username: "diegogod",
@@ -50,7 +49,7 @@ describe("GET /api/v1/carts/", () => {
     };
     const jwt = await gerateJWT(payload);
     const { body } = await request(app)
-      .get(`/api/v1/pictures/${id}`)
+      .get(`/api/v1/carts/${id}`)
       .auth(jwt, { type: "bearer" });
     expect(body).toBeInstanceOf(Object);
   });
