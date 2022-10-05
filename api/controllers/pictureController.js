@@ -97,9 +97,6 @@ const pictureController = {
   deletePicture: async (req, res) => {
     try {
       let id = req.params.id;
-      if (!id) {
-        res.status(400).json("debe ingresar un id");
-      }
       let picture = await persistence.searchById("Picture", id);
       if (picture) {
         await persistence.delete('Picture', req.params.id);

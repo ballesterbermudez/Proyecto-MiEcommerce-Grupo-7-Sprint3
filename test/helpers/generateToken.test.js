@@ -10,9 +10,9 @@ afterEach(() => {
     server.close();
 });
 
-afterAll(async () => {
-    await db.sequelize.close();
-})
+// afterAll(async () => {
+//     await db.sequelize.close();
+// })
 
 describe.skip('Generar JWT', () => {
     test.skip('Generar Token ', async() => {
