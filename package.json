@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --verbose --watchAll",
-    "coverage": "jest --coverage",
+    "test": "jest --verbose --watchAll --maxWorkers=1",
+    "coverage": "jest --coverage --maxWorkers=1",
     "start": "node server.js"
   },
   "author": "",

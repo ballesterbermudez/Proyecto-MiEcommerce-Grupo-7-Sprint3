@@ -8,9 +8,11 @@ afterEach(() => {
     server.close();
 });
 
+
 afterAll(async () => {
     await db.sequelize.close();
 })
+
 
 describe( 'Listado de productos', () => {
    
@@ -188,13 +190,12 @@ describe('Buscamos por keyword', () =>{
 describe('Buscamos productos mostwanted', () => {
     it('No obtenemos resultados de la busqueda', async() =>{
         const token = await generateJWT({role: 'GUEST'})
-       await  db.Product.update({mostwanted: false}, {where: {id: 30}})
-
-            const resp = await request(app)
-                .get('/api/v1/products/mostwanted')
-                .auth(token, {type: 'bearer'})
-            expect(resp.status).toBe(404) 
-            expect(resp.body.message).toBe("No hubieron resultados")         
+        await  db.Product.update({mostwanted: false}, {where: {id: 30}})
+        const resp = await request(app)
+            .get('/api/v1/products/mostwanted')
+            .auth(token, {type: 'bearer'})
+        expect(resp.status).toBe(404) 
+        expect(resp.body.message).toBe("No hubieron resultados")         
     })
     it('obtenemos resultados de la busqueda', async() =>{
         const token = await generateJWT({role: 'GUEST'})
@@ -230,5 +231,6 @@ describe('Eliminamos productos', () => {
         expect(resp.body.message).toBe("no existe el articulo")
     })
 })
+
 
 

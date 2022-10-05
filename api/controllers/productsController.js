@@ -51,7 +51,6 @@ const controller = {
             
 
          }catch(error){
-            console.log(error)
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
         },
@@ -122,7 +121,7 @@ const controller = {
 
                 
                     let product = await persistence.searchById(modelName, req.params.id)
-  
+                    
                     if(product != null)
                     {
                         let {...parametorsModificados} = req.body;
