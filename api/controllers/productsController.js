@@ -51,7 +51,6 @@ const controller = {
             
 
          }catch(error){
-            console.log(error)
             resp.status(500).json( {message : "No se pudo acceder a la informacion"});
          }
         },
@@ -61,9 +60,6 @@ const controller = {
 
         try{
 
-
-            if(Number.isInteger(Number(req.params.id)))
-            {
                 const criteria = {include: {association: 'product_category', attributes: ["id", "title"]}
                                   ,include: {association: 'galery'}, 
                                   where: {id: req.params.id} }
@@ -78,11 +74,7 @@ const controller = {
                 {
                     resp.status(404).json({message: "Producto no encontrado"});
                 }
-            }
-            else {
-                resp.status(401).json({message: "El id proporcionado no es un entero"})
-            }
-            
+              
 
          }catch(error){
             
@@ -127,10 +119,9 @@ const controller = {
 
             try{
 
-                if(Number.isInteger(Number(req.params.id)))
-                {
+                
                     let product = await persistence.searchById(modelName, req.params.id)
-  
+                    
                     if(product != null)
                     {
                         let {...parametorsModificados} = req.body;
@@ -155,10 +146,8 @@ const controller = {
                     {
                      resp.status(404).json({message: "Producto no encontrado"});
                     }
-                 }
-                else {
-                     resp.status(401).json({message: "El id proporcionado no es un entero"})
-                }
+                 
+                
  
             }catch(error){
                 if( error instanceof ValidationError)
@@ -189,7 +178,7 @@ const controller = {
                 }
 
             }catch(error){
-                    console.log(error)
+                    
             resp.status(500).json({message : "Error interno"})
 
             }
@@ -233,7 +222,7 @@ const controller = {
             
 
          }catch(error){
-            console.log(error)
+            
             resp.status(500).json( {message : "Error interno"});
          }
 
