@@ -2,6 +2,7 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
+const persistance = require("../../api/persistence/persistence");
 
 afterEach(() => {
   server.close();
@@ -16,7 +17,8 @@ const payload = {
   role: "GOD",
 };
 
-describe("GET /usuarios", () => {
+//LISTAR TODOS LOS USUARIOS
+describe("GET /users", () => {
   test("Debe retornar un statusCode 200", async () => {
     const token = await generateJWT(payload);
     const { statusCode } = await request(app)
@@ -47,7 +49,8 @@ describe("GET /usuarios", () => {
   });
 });
 
-describe("GET /usuario/:id", () => {
+//LISTAR USUARIO POR ID
+describe("GET /users/:id", () => {
   test("Debe retornar un statusCode 200", async () => {
     const userId = "1";
     const token = await generateJWT(payload);
@@ -85,5 +88,26 @@ describe("GET /usuario/:id", () => {
     expect(body.user).toEqual(
       expect.objectContaining({ email: expect.any(String) })
     );
-  });
+  });  
 });
+
+//CREAR USUARIO
+describe("POST /users", () => {
+    test("Debe retornar un statusCode 200", async () => {
+      const newUser = {
+        email: "supertest@cenco.com",
+        username: "jest",
+        password: "123456",
+        first_name: "El",
+        last_name: "Tester",
+        profilepic: "https://sequelize.com/constraints/",
+        id_role: 2,
+      };
+      const token = await generateJWT(payload);
+      const {statusCode} = await request(app)
+        .post(`/api/v1/users/`)
+        .auth(token, { type: "bearer" })
+        .send(newUser);
+      expect(statusCode).toBe(200);
+    });
+  });
