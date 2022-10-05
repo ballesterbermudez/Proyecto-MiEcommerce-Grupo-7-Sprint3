@@ -120,7 +120,7 @@ describe( 'Creacion de productos', () => {
 
 describe( 'Modificacion de Productos', () => {
     it('modificamos un producto existente',async () =>{
-        const token = await generateJWT({role: 'GOD'})
+        const token = await generateJWT({role: 'ADMIN'})
         const id = 30
         const newData = {
             "title": 'testProductModification',
@@ -134,7 +134,7 @@ describe( 'Modificacion de Productos', () => {
         expect(resp.body).toMatchObject(expect.objectContaining({title: 'testProductModification'}))
     })
     it('modificamos un producto inexistente',async () =>{
-        const token = await generateJWT({role: 'GOD'})
+        const token = await generateJWT({role: 'ADMIN'})
         const id = 100
         const newData = {
             "title": 'testProductModification',
@@ -231,6 +231,35 @@ describe('Eliminamos productos', () => {
         expect(resp.body.message).toBe("no existe el articulo")
     })
 })
+
+describe('Solicitudes no autorizadas', ()=> {
+    it('crear un prodocto nuevo', async ()=>{
+        const token = await generateJWT({role: 'GUEST'})
+        const newProduct = { 
+            "title": 'testProduct',
+            "price": 100,
+            "description": 'lorem ipsum dolor sit amet,consectetur adipscing elit,...',
+            "mostwanted": true,
+            "stock": 1,
+            "category": 1 
+        }
+        const resp = await request(app)
+            .post('/api/v1/products/')
+            .auth(token, {type: 'bearer'})
+            .send(newProduct)
+            expect(resp.status).toBe(403) 
+            expect(resp.body.message).toBe("acceso no autorizado")
+    })
+    it('solicitud de listado de productos sin token', async() => {
+        const resp = await request(app)
+            .get('/api/v1/products')
+            .send()
+        expect(resp.status).toBe(401) 
+        expect(resp.body.msg).toBe("Token invalido")
+    })
+   
+})
+
 
 
 
