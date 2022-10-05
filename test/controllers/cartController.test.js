@@ -83,7 +83,20 @@ describe("PUT /api/v1/carts/:id", () => {
       .send({ id_product: 1, quantity: 2 });
     expect(statusCode).toBe(200);
   });
-  test.todo("debe devolver status 404 al no encontrar un usuario");
+  test("debe devolver status 404 al no encontrar un usuario", async () => {
+    const idUser = 99999;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { statusCode } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send({ id_product: 1, quantity: 2 });
+    expect(statusCode).toBe(404);
+  });
   test.todo("debe devolver un json en todo caso (funcione o no)");
   test.todo("debe crear un carrito en un usuario que no tenga carrito");
   test.todo(
