@@ -146,6 +146,63 @@ describe("PUT /api/v1/carts/:id", () => {
     });
     expect(cartConCosas).toHaveLength(2);
   });
-  test.todo("debe borrar un elemento de un carrito");
-  test.todo("debe eliminar el carrito de un usuario");
+
+  test("debe crear y borrar un elemento de un carrito", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { body } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([
+        { id_product: 3, quantity: 1 },
+        { id_product: 4, quantity: 1 },
+      ]);
+    let cartConCosas = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartConCosas).toHaveLength(2);
+
+    await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([{ id_product: 4, quantity: 1 }]);
+    let cartConUnaCosaMenos = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartConUnaCosaMenos).toHaveLength(1);
+  });
+  test("debe crear e eliminar el carrito de un usuario", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { body } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([
+        { id_product: 3, quantity: 1 },
+        { id_product: 4, quantity: 1 },
+      ]);
+    let cartConCosas = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartConCosas).toHaveLength(2);
+
+    await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([]);
+    let cartVacio = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartVacio).toHaveLength(0);
+  });
 });
