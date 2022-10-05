@@ -13,7 +13,7 @@ afterAll(async () => {
 });
 
 describe("GET /pictures", () => {
-    test("debo devolver un status 200", async () => {
+    test("debo devolver un status 200 por query", async () => {
         const id = 6;
         const payload = {
             id: 1,
@@ -23,6 +23,19 @@ describe("GET /pictures", () => {
         const jwt = await gerateJWT(payload);
         const { statusCode } = await request(app)
             .get(`/api/v1/pictures?product=${id}`)
+            .auth(jwt, { type: "bearer" });
+        expect(statusCode).toBe(200);
+    });
+    test("debo devolver un status 200 por product", async () => {
+        const id = 6;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .get(`/api/v1/products/${id}/pictures`)
             .auth(jwt, { type: "bearer" });
         expect(statusCode).toBe(200);
     });
@@ -39,7 +52,7 @@ describe("GET /pictures", () => {
             .auth(jwt, { type: "bearer" });
         expect(statusCode).toBe(400);
     });
-    test("debo devolver un status 400", async () => {
+    test("debo devolver un status 404", async () => {
         const id = 40;
         const payload = {
             id: 1,
@@ -111,7 +124,7 @@ describe("POST /pictures", () => {
         const picture = {
             url: 'alibaba.com',
             description: 'vuela alto',
-            id_product: 2
+            id_product: 6
         }
         const jwt = await gerateJWT(payload);
         const { statusCode } = await request(app)
@@ -149,10 +162,123 @@ describe("POST /pictures", () => {
         const jwt = await gerateJWT(payload);
         const { statusCode } = await request(app)
             .post(`/api/v1/pictures`)
-            .auth(jwt, { type: "bearer" }).send(picture);;
+            .auth(jwt, { type: "bearer" }).send(picture);
             expect(statusCode).toBe(400);
     });
 });
+
+describe('PUT /pictures/:id', () => {
+    test('devuelve un status 200', async () => {
+        const id = 2;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+            url: 'fireball.com'
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+            expect(statusCode).toBe(200);
+    })            
+    test('devuelve un status 200', async () => {
+        const id = 2;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+            description: 'whisky de calidad'
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+            expect(statusCode).toBe(200);
+    })
+    test('devuelve un status 400', async () => {
+        const id = 2;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+            expect(statusCode).toBe(400);
+    })
+    test('devuelve un status 404', async () => {
+        const id = 1;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+            url: 'fireball.com',
+            description: 'whisky de calidad',
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+            expect(statusCode).toBe(404);
+    })
+    test('devuelve un status 401', async () => {
+        const id = 2;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+            url: 'fireball',
+            description: 'whisky de calidad',
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+            expect(statusCode).toBe(401);
+    })
+})
+
+describe('DELETE /pictures/:id', () => {
+    test('devuelve un status 200', async () => {
+        let {id} = await db.Picture.findOne({where: {url: 'alibaba.com'}, attributes: ['id']});
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .delete(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" });
+            expect(statusCode).toBe(200);
+    })
+    test('devuelve un status 404', async () => {
+        let id = 1;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .delete(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" });
+            expect(statusCode).toBe(404);
+    })
+})
 
 describe("getPicture controlador picture", () => {
     test("devuelve una picture", async () => {
@@ -165,3 +291,78 @@ describe("getPicture controlador picture", () => {
         });
     });
 });
+
+describe('Prueba errores 500', () => {
+    beforeAll(async () => {
+        await db.sequelize.close();
+    })
+    test('GET /pictures', async () => {
+        const id = 6;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .get(`/api/v1/pictures?product=${id}`)
+            .auth(jwt, { type: "bearer" });
+        expect(statusCode).toBe(500);
+    })
+    test('GET /pictures/:id', async () => {
+        const id = 6;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .get(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" });
+        expect(statusCode).toBe(500);
+    })
+    test('POST /pictures', async () => {
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const picture = {
+            url: 'alibaba.com',
+            description: 'vuela alto',
+            id_product: 6
+        }
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .post(`/api/v1/pictures`)
+            .auth(jwt, { type: "bearer" }).send(picture);
+        expect(statusCode).toBe(500);
+    })
+    test('PUT /pictures', async () => {
+        const id = 6;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .put(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" });
+        expect(statusCode).toBe(500);
+    })
+    test('DELETE /pictures', async () => {
+        const id = 6;
+        const payload = {
+            id: 1,
+            username: "diegogod",
+            role: "GOD",
+        };
+        const jwt = await gerateJWT(payload);
+        const { statusCode } = await request(app)
+            .delete(`/api/v1/pictures/${id}`)
+            .auth(jwt, { type: "bearer" });
+        expect(statusCode).toBe(500);
+    })
+})
