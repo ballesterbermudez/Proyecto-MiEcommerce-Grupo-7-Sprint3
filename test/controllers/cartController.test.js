@@ -235,3 +235,23 @@ describe("PUT /api/v1/carts/:id", () => {
     expect(cartVacio).toHaveLength(0);
   });
 });
+
+describe("Prueba de status 500", () => {
+  beforeAll(async () => {
+    await db.sequelize.close();
+  });
+
+  test("prueba get validateUserId middleware debe dar status 500", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { statusCode } = await request(app)
+      .get("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" });
+    expect(statusCode).toBe(500);
+  });
+});
