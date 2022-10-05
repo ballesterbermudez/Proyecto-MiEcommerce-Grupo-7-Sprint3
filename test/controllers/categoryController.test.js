@@ -48,7 +48,7 @@ describe('Listado de productos de una categoria', () => {
 })
 
 describe('Crear una categoria', () => {
-    it.skip('crear una categoria correctamente', async () => {
+    it('crear una categoria correctamente', async () => {
         const token = await generateJWT({role: 'GOD'})
         const newCategory = {title: "testCategory"}
         const resp = await request(app)
@@ -67,19 +67,29 @@ describe('Crear una categoria', () => {
             .send(newCategory)
         expect(resp.status).toBe(400) 
     })
+    test('crea una categoria con titulo invalido', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const newCategory = {title: 1}
+        const resp = await request(app)
+            .post('/api/v1/category')
+            .auth(token, {type: 'bearer'})
+            .send(newCategory)
+        expect(resp.status).toBe(401) 
+        expect(resp.body).toBeInstanceOf(Array)
+    })
 })
 
 describe('Modificar una categoria', () => {
     it('modificar una categoria correctamente', async () => {
         const token = await generateJWT({role: 'GOD'})
-        const id = 8
-        const newCategory = {title: "testCatMod"}
+        let {id} = await db.Category.findOne({where: {title: "testCategory"}, attributes: ['id']});
+        const newCategory = {title: "testCategoryEdit"}
         const resp = await request(app)
             .put('/api/v1/category/' + id)
             .auth(token, {type: 'bearer'})
             .send(newCategory)
         expect(resp.status).toBe(200) 
-        expect(resp.body).toMatchObject(expect.objectContaining({title: "testCatMod"}))
+        expect(resp.body).toMatchObject(expect.objectContaining({id: id, title: "testCategoryEdit"}))
     })
     it('modificar una categoria incorrectamente', async () => {
         const token = await generateJWT({role: 'GOD'})
@@ -92,6 +102,17 @@ describe('Modificar una categoria', () => {
         expect(resp.status).toBe(400) 
         expect(resp.body).toBe("debe ingresar un titulo")
     })
+    it('modificar una categoria con titulo invalido', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const newCategory = {title: 1}
+        const id = 1
+        const resp = await request(app)
+            .put('/api/v1/category/' + id)
+            .auth(token, {type: 'bearer'})
+            .send(newCategory)
+        expect(resp.status).toBe(401) 
+        expect(resp.body).toBeInstanceOf(Array)
+    })
     it('modificar una categoria inexistente', async () => {
         const token = await generateJWT({role: 'GOD'})
         const id = 200
@@ -103,29 +124,17 @@ describe('Modificar una categoria', () => {
         expect(resp.status).toBe(404) 
         expect(resp.body).toBe("no se encontro categoria")
     })
-    it('error de validacion', async () => {
-        const token = await generateJWT({role: 'GOD'})
-        const id = 7
-        const newCategory = {title: 23}
-        const resp = await request(app)
-            .put('/api/v1/category/' + id)
-            .auth(token, {type: 'bearer'})
-            .send(newCategory)
-        expect(resp.status).toBe(401) 
-        
-    })
 })
 
 describe('Borrar una categoria', () => {
     it('borrar una categoria correctamente', async () => {
         const token = await generateJWT({role: 'GOD'})
-        const id = 80
-        await db.Category.create({id: id, title: 'categoryToDelete'})
+        let {id} = await db.Category.findOne({where: {title: "testCategoryEdit"}, attributes: ['id']});
         const resp = await request(app)
             .delete('/api/v1/category/' + id)
             .auth(token, {type: 'bearer'})
-        expect(resp.status).toBe(200) 
-        expect(resp.body).toMatchObject(expect.objectContaining({title: 'categoryToDelete'}))
+        expect(resp.statusCode).toBe(200) 
+        expect(resp.body).toMatchObject(expect.objectContaining({id: id, title: 'testCategoryEdit'}))
     })
     it('borrar una categoria inexistente', async () => {
         const token = await generateJWT({role: 'GOD'})
@@ -135,7 +144,64 @@ describe('Borrar una categoria', () => {
             .auth(token, {type: 'bearer'})
         expect(resp.status).toBe(404)
         expect(resp.body).toBe("no se encontro la category")
-
     })
+    test('borrar una categoria inexistente', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const id = 80
+        const resp = await request(app)
+            .delete('/api/v1/category/' + id)
+            .auth(token, {type: 'bearer'})
+        expect(resp.status).toBe(404)
+        expect(resp.body).toBe("no se encontro la category")
+    })
+})
 
+describe('Prueba de status 500', () => {
+    beforeAll(async () => {
+        await db.sequelize.close();
+    })
+    test('GET /category', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const {statusCode, body} = await request(app)
+            .get('/api/v1/category')
+            .auth(token, {type: 'bearer'})
+        expect(statusCode).toBe(500)
+        expect(body).toBe("No se pudo acceder a la informacion")
+    })
+    test('GET /category', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const id = 1;
+        const {statusCode, body} = await request(app)
+            .get(`/api/v1/category/${id}`)
+            .auth(token, {type: 'bearer'})
+        expect(statusCode).toBe(500)
+        expect(body).toBe("No se pudo acceder a la informacion")
+    })
+    test('POST /category', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const newCategory = {title: "testCategory"}
+        const {statusCode, body} = await request(app)
+            .post(`/api/v1/category`)
+            .auth(token, {type: 'bearer'}).send(newCategory)
+        expect(statusCode).toBe(500)
+        expect(body).toBeInstanceOf(Object)
+    })
+    test('PUT /category', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const id = 1;
+        const {statusCode, body} = await request(app)
+            .put(`/api/v1/category/${id}`)
+            .auth(token, {type: 'bearer'})
+        expect(statusCode).toBe(500)
+        expect(body).toBeInstanceOf(Object)
+    })
+    test('DELETE /category', async () => {
+        const token = await generateJWT({role: 'GOD'})
+        const id = 1;
+        const {statusCode, body} = await request(app)
+            .delete(`/api/v1/category/${id}`)
+            .auth(token, {type: 'bearer'})
+        expect(statusCode).toBe(500)
+        expect(body).toBeInstanceOf(Object)
+    })
 })
