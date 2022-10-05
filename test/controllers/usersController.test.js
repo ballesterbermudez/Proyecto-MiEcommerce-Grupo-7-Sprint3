@@ -94,10 +94,10 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
 
 //CREAR USUARIO
 describe("POST - Crear un usuario en la base de datos - /users", () => {
-  test.skip("Debe retornar un statusCode 200", async () => {
+  test("Debe retornar un statusCode 200", async () => {
     const newUser = {
-      email: "supertest@cenco.com",
-      username: "jest",
+      email: "supertest1@cenco.com",
+      username: "jest1",
       password: "123456",
       first_name: "El",
       last_name: "Tester",
@@ -112,10 +112,10 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
     expect(statusCode).toBe(200);
   });
 
-  test.skip("Debe retornar un objeto usuario", async () => {
+  test("Debe retornar un objeto usuario", async () => {
     const newUser = {
-      email: "supertest1@cenco.com",
-      username: "jest1",
+      email: "supertest2@cenco.com",
+      username: "jest2",
       password: "123456",
       first_name: "El",
       last_name: "Tester",
@@ -123,7 +123,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       id_role: 1,
     };
     const token = await generateJWT(payload);
-    const {body} = await request(app)
+    const { body } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
       .send(newUser);
@@ -619,9 +619,10 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       .put(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" })
       .send(newUserData);
-      expect(body.user).toEqual(
-        expect.objectContaining({ email: expect.any(String) })
-      );  });
+    expect(body.user).toEqual(
+      expect.objectContaining({ email: expect.any(String) })
+    );
+  });
 
   test("Debe retornar un statusCode 412 por error en ROL", async () => {
     const userId = 10;
@@ -655,7 +656,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
     expect(statusCode).toBe(404);
   });
 
-  test("Debe retornar un statusCode 500 error en la base de datos", async () => {
+  test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
     const userId = 10;
     const newUserData = {
       email: "tessdt3@cenco.com",
@@ -675,7 +676,50 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
 
 //ELIMINIAR USUARIO
 describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", () => {
-  test("msg", () => {
-    expect(200).toBe(200);
+  test("Debe retornar un statusCode 200 ", async () => {
+    const {id} = await db.User.findOne({
+      where: { email: "supertest1@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .delete(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un obeto usuario", async () => {
+    const {id} = await db.User.findOne({
+      where: { email: "supertest2@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
+    const token = await generateJWT(payload);
+    const { body } = await request(app)
+      .delete(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(body.userDeleted).toEqual(
+      expect.objectContaining({ email: expect.any(String) })
+    );
+  });
+
+  test("Debe retornar un statusCode 404", async () => {
+    const userId = 999;
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .delete(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(404);
+  });
+
+  test.skip("Debe retornar un statusCode 500", async () => {
+    const userId = 999;
+    const token = await generateJWT(payload);
+    db.sequelize.close();
+    const { statusCode } = await request(app)
+      .delete(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(500);
   });
 });
