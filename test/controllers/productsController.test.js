@@ -9,10 +9,6 @@ afterEach(() => {
 });
 
 
-afterAll(async () => {
-    await db.sequelize.close();
-})
-
 
 describe( 'Listado de productos', () => {
    
@@ -210,6 +206,7 @@ describe('Buscamos productos mostwanted', () => {
     })
 })
 
+
 describe('Eliminamos productos', () => {
     it('Borramos un producto existente', async ()=> {
         const token = await generateJWT({role: 'GOD'})
@@ -258,6 +255,90 @@ describe('Solicitudes no autorizadas', ()=> {
         expect(resp.body.msg).toBe("Token invalido")
     })
    
+})
+
+describe('Errores de acceso a bd', () => {
+    
+    it('listar', async () =>{
+        await db.sequelize.close()
+        const token = await generateJWT({role: 'GUEST'})
+        const resp = await request(app)
+            .get('/api/v1/products')
+            .auth(token, {type: 'bearer'})
+            .send()
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("No se pudo acceder a la informacion")
+    })
+    it('producto por id', async () =>{
+        const token = await generateJWT({role: 'GUEST'})
+        const id = 1
+        const resp = await request(app)
+            .get('/api/v1/products/' + id)
+            .auth(token, {type: 'bearer'})
+            .send()
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("No se pudo acceder a la informacion")
+    })
+    it('create', async ()=>{
+        const token = await generateJWT({role: 'GOD'})
+        const newProduct = { 
+            "title": 'testProduct',
+            "price": 100,
+            "description": 'lorem ipsum dolor sit amet,consectetur adipscing elit,...',
+            "mostwanted": true,
+            "stock": 1,
+            "category": 1 
+        }
+        const resp = await request(app)
+            .post('/api/v1/products/')
+            .auth(token, {type: 'bearer'})
+            .send(newProduct)
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("No fue posible insertar el producto")
+    })
+    it('update',async () =>{
+        const token = await generateJWT({role: 'ADMIN'})
+        const id = 30
+        const newData = {
+            "title": 'testProductModification',
+            "price": 120,
+        }
+        const resp = await request(app)
+            .put('/api/v1/products/' + id)
+            .auth(token, {type: 'bearer'})
+            .send(newData)
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("No fue posible modificar el producto")
+    })
+    it('search keyword', async() =>{
+        const token = await generateJWT({role: 'GUEST'})
+        const keyword = "ec"
+            const resp = await request(app)
+                .get('/api/v1/products/search')
+                .auth(token, {type: 'bearer'})
+                .query({q: keyword})
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("Error interno")
+                  
+    })
+    it('most wanted', async() =>{
+        const token = await generateJWT({role: 'GUEST'})
+            const resp = await request(app)
+                .get('/api/v1/products/mostwanted')
+                .auth(token, {type: 'bearer'})
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("No se pudo acceder a la informacion")
+                  
+    })
+    it('delete', async ()=> {
+        const token = await generateJWT({role: 'GOD'})
+        const id = 40
+        const resp = await request(app)
+            .delete('/api/v1/products/' + id)
+            .auth(token, {type: 'bearer'})
+        expect(resp.status).toBe(500) 
+        expect(resp.body.message).toBe("Error interno")
+    })
 })
 
 
