@@ -67,3 +67,17 @@ describe("GET /api/v1/carts/:id", () => {
     expect(body).toBeInstanceOf(Object);
   });
 });
+
+describe("PUT /api/v1/carts/:id", () => {
+  test("debe devolver status 200 al modiificar un carrito correctamente", async () => {});
+  test("debe devolver status 404 al no encontrar un usuario");
+  test("debe devolver un json en todo caso (funcione o no)");
+  test("debe crear un carrito en un usuario que no tenga carrito");
+  test(
+    "debe aumentar los elementos de la tabla cart al poner un elemento mas en un carrito ya creado"
+  );
+  test(
+    "debe disminuir los elementos de la tabla cart al eliminar enviar un carrito con un producto menos"
+  );
+  test("debe eliminar el carrito de un usuario");
+});
