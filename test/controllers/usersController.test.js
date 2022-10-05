@@ -75,4 +75,15 @@ describe("GET /usuario/:id", () => {
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(500);
   });
+
+  test("Debe retornar un objeto usuario", async () => {
+    const userId = "1";
+    const token = await generateJWT(payload);
+    const { body } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(body.user).toEqual(
+      expect.objectContaining({ email: expect.any(String) })
+    );
+  });
 });
