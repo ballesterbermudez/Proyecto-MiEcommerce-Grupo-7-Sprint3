@@ -1,16 +1,12 @@
 const persistence = require("../persistence/persistence");
 const { ValidationError } = require("sequelize");
-const {Product} = require('../database/models');
+const { Product } = require("../database/models");
 
 const categoryController = {
     listCategorys: async (req, res) => {
         try {
             let categorys = await persistence.searchAll("Category");
-            if (categorys) {
-                return res.status(200).json(categorys);
-            } else {
-                return res.status(404).json("No se encontro ninguna categoria");
-            }
+            return res.status(200).json(categorys);
         } catch (error) {
             console.log(error);
             res.status(500).json("No se pudo acceder a la informacion");
@@ -19,7 +15,10 @@ const categoryController = {
     detailCategory: async (req, res) => {
         try {
             let category = await persistence.searchByCriteria("Category", {
-                include: { association: "product_category" , include: { association: 'galery', limit: 1}},
+                include: {
+                    association: "product_category",
+                    include: { association: "galery", limit: 1 },
+                },
                 attributes: ["title"],
                 where: { id: req.params.id },
             });
@@ -61,25 +60,21 @@ const categoryController = {
     update: async (req, res) => {
         try {
             let id = req.params.id;
-            if (id) {
-                let category = await persistence.searchById("Category", id);
-                if (category) {
-                    if (req.body.title) {
-                        await persistence.updateData("Category", id, {
-                            title: req.body.title,
-                        });
-                        res.status(200).json({
-                            id: Number(id),
-                            title: req.body.title,
-                        });
-                    } else {
-                        res.status(400).json("debe ingresar un titulo");
-                    }
+            let category = await persistence.searchById("Category", id);
+            if (category) {
+                if (req.body.title) {
+                    await persistence.updateData("Category", id, {
+                        title: req.body.title,
+                    });
+                    res.status(200).json({
+                        id: Number(id),
+                        title: req.body.title,
+                    });
                 } else {
-                    res.status(404).json("no se encontro categoria");
+                    res.status(400).json("debe ingresar un titulo");
                 }
             } else {
-                res.status(400).json("debe ingresar un id valido");
+                res.status(404).json("no se encontro categoria");
             }
         } catch (error) {
             if (error instanceof ValidationError) {
@@ -89,7 +84,7 @@ const categoryController = {
                 });
                 res.status(401).json(errorArray);
             } else {
-                console.log(error)
+                console.log(error);
                 res.status(500).json({
                     message: "No fue posible modificar el producto",
                 });
@@ -99,9 +94,6 @@ const categoryController = {
     delete: async (req, res) => {
         try {
             let id = req.params.id;
-            if (!id) {
-                res.status(400).json("debe ingresar un id");
-            }
             let category = await persistence.searchById("Category", id);
             if (category) {
                 await persistence.delete("Category", id);
@@ -110,17 +102,9 @@ const categoryController = {
                 res.status(404).json("no se encontro la category");
             }
         } catch (error) {
-            if (error instanceof ValidationError) {
-                let errorArray = [];
-                error.errors.forEach((el, i) => {
-                    errorArray[i] = el.message;
-                });
-                res.status(401).json(errorArray);
-            } else {
-                res.status(500).json({
-                    message: "No fue posible borrar el producto",
-                });
-            }
+            res.status(500).json({
+                message: "No fue posible borrar el producto",
+            });
         }
     },
 };
