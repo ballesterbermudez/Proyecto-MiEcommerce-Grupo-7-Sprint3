@@ -12,24 +12,55 @@ afterAll(async () => {
 });
 
 //USADO PARA CREAR TOKEN
-const payload = {
+const payloadGod = {
   id: 1,
   username: "diegogod",
   role: "GOD",
 };
 
+const payloadAdmin = {
+    id: 2,
+    username: "hernana",
+    role: "ADMIN",
+  };
+
+  const payloadGuest = {
+    id: 5,
+    username: "juven",
+    role: "GUEST",
+  };
+
+//siendo guest listar mi user y listar todo
+//siendo admin listar todo
+
 //LISTAR TODOS LOS USUARIOS
 describe("GET - Listar todos los usuarios - /users", () => {
-  test("Debe retornar un statusCode 200", async () => {
-    const token = await generateJWT(payload);
+  test("Debe retornar un statusCode 200 rol GOD", async () => {
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .get("/api/v1/users")
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(200);
   });
 
+  test("Debe retornar un statusCode 200 rol ADMIN", async () => {
+    const token = await generateJWT(payloadAdmin);
+    const { statusCode } = await request(app)
+      .get("/api/v1/users")
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 403 rol GUEST", async () => {
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .get("/api/v1/users")
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(403);
+  });
+
   test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     await db.sequelize.close();
     const { statusCode } = await request(app)
       .get("/api/v1/users")
@@ -38,7 +69,7 @@ describe("GET - Listar todos los usuarios - /users", () => {
   });
 
   test("Debe retornar un array con usuarios", async () => {
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .get("/api/v1/users")
       .auth(token, { type: "bearer" });
@@ -52,9 +83,36 @@ describe("GET - Listar todos los usuarios - /users", () => {
 
 //LISTAR USUARIO POR ID
 describe("GET - Listar un usuario por id - /users/:userId", () => {
-  test("Debe retornar un statusCode 200", async () => {
+  test("Debe retornar un statusCode 200 rol GOD", async () => {
     const userId = "1";
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
+    const { statusCode } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 200 rol ADMIN", async () => {
+    const userId = "1";
+    const token = await generateJWT(payloadAdmin);
+    const { statusCode } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 403 rol GUEST", async () => {
+    const userId = "1";
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(403);
+  });
+
+  test("Debe retornar un statusCode 200 rol GUEST", async () => {
+    const userId = "5";
+    const token = await generateJWT(payloadGuest);
     const { statusCode } = await request(app)
       .get(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -63,7 +121,7 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
 
   test("Debe retornar un objeto usuario", async () => {
     const userId = "1";
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .get(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -74,7 +132,7 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
 
   test("Debe retornar un statusCode 401", async () => {
     const userId = "999";
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .get(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -83,7 +141,7 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
 
   test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
     const userId = "1";
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     await db.sequelize.close();
     const { statusCode } = await request(app)
       .get(`/api/v1/users/${userId}`)
@@ -104,7 +162,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -122,7 +180,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -142,7 +200,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 999,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -158,7 +216,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 2,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -176,7 +234,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     db.sequelize.close();
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
@@ -196,7 +254,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -214,7 +272,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -232,7 +290,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -251,7 +309,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -269,7 +327,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -287,7 +345,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -305,7 +363,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -323,7 +381,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -342,7 +400,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -360,7 +418,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -378,7 +436,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -397,7 +455,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -415,7 +473,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -433,7 +491,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -451,7 +509,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -469,7 +527,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -488,7 +546,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -506,7 +564,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -524,7 +582,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -542,7 +600,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -560,7 +618,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -579,7 +637,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       profilepic: "foto de perfil",
       id_role: 1,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
@@ -598,7 +656,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       password: "testsd1234",
       id_role: 2,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .put(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" })
@@ -614,7 +672,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       password: "testsd1234",
       id_role: 2,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .put(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" })
@@ -632,7 +690,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       password: "testsd1234",
       id_role: 999,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .put(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" })
@@ -648,7 +706,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       password: "testsd1234",
       id_role: 2,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .put(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" })
@@ -664,7 +722,7 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       password: "testsd1234",
       id_role: 2,
     };
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     await db.sequelize.close();
     const { statusCode } = await request(app)
       .put(`/api/v1/users/${userId}`)
@@ -682,7 +740,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       attributes: ["id"],
     });
     const userId = id;
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -695,7 +753,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       attributes: ["id"],
     });
     const userId = id;
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -706,7 +764,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
 
   test("Debe retornar un statusCode 404", async () => {
     const userId = 999;
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
@@ -715,7 +773,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
 
   test.skip("Debe retornar un statusCode 500", async () => {
     const userId = 999;
-    const token = await generateJWT(payload);
+    const token = await generateJWT(payloadGod);
     db.sequelize.close();
     const { statusCode } = await request(app)
       .delete(`/api/v1/users/${userId}`)
