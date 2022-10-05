@@ -19,7 +19,7 @@ const payload = {
 };
 
 //LISTAR TODOS LOS USUARIOS
-describe("GET /users", () => {
+describe("GET - Listar todos los usuarios - /users", () => {
   test("Debe retornar un statusCode 200", async () => {
     const token = await generateJWT(payload);
     const { statusCode } = await request(app)
@@ -51,7 +51,7 @@ describe("GET /users", () => {
 });
 
 //LISTAR USUARIO POR ID
-describe("GET /users/:id", () => {
+describe("GET - Listar un usuario por id - /users/:id", () => {
   test("Debe retornar un statusCode 200", async () => {
     const userId = "1";
     const token = await generateJWT(payload);
@@ -93,7 +93,7 @@ describe("GET /users/:id", () => {
 });
 
 //CREAR USUARIO
-describe("POST /users", () => {
+describe("POST - Crear un usuario en la base de datos - /users", () => {
   test.skip("Debe retornar un statusCode 200", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -528,6 +528,26 @@ describe("POST /users", () => {
       .send(newUser);
     expect(statusCode).toBe(401);
   });
+
+  //VALIDATES DE PROFILEP PIC
+  test("Debe retornar un statusCode 401 validate profilepic formato incorrecto", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "foto de perfil",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
 
   
 });
