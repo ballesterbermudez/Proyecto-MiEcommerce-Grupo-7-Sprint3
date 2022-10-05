@@ -7,7 +7,6 @@ const routePictures = require("./api/routes/routePictures");
 const routeProducts = require("./api/routes/routeProducts");
 const routeUsers = require("./api/routes/routeUsers");
 const routeCategory = require('./api/routes/routeCategory');
-const routeTest = require('./api/routes/routeTest');
 const verifyJWT = require("./api/middelware/verifyJWT");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -25,7 +24,6 @@ app.get("/pai/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
 
-app.use("/test", routeTest);
 
 // Swagger - Documentacion api
 
