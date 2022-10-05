@@ -164,6 +164,42 @@ describe("POST /users", () => {
     expect(statusCode).toBe(401);
   });
 
+  test("Debe retornar un statusCode 401 validate email formato incorrecto", async () => {
+    const newUser = {
+      email: "supertest",
+      username: "123",
+      password: "123",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
+  test("Debe retornar un statusCode 401 validate username unique", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: 'diegogod',
+      password: "123456",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payload);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(401);
+  });
+
   test("Debe retornar un statusCode 401 validate username no es String", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -236,21 +272,5 @@ describe("POST /users", () => {
     expect(statusCode).toBe(401);
   });
 
-  test("Debe retornar un statusCode 401 validate email incorrecto", async () => {
-    const newUser = {
-      email: "supertest@cenco.com",
-      username: "123",
-      password: "123",
-      first_name: "El",
-      last_name: "Tester",
-      profilepic: "https://sequelize.com/constraints/",
-      id_role: 1,
-    };
-    const token = await generateJWT(payload);
-    const { statusCode } = await request(app)
-      .post(`/api/v1/users/`)
-      .auth(token, { type: "bearer" })
-      .send(newUser);
-    expect(statusCode).toBe(401);
-  });
+  
 });
