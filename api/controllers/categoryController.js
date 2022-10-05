@@ -23,7 +23,7 @@ const categoryController = {
                 attributes: ["title"],
                 where: { id: req.params.id },
             });
-            if (category) {
+            if (category.length > 0) {
                 return res.status(200).json(category);
             } else {
                 return res.status(404).json("No se encontro ninguna categoria");
@@ -89,6 +89,7 @@ const categoryController = {
                 });
                 res.status(401).json(errorArray);
             } else {
+                console.log(error)
                 res.status(500).json({
                     message: "No fue posible modificar el producto",
                 });

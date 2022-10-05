@@ -10,13 +10,15 @@ afterAll(async () => {
     await db.sequelize.close();
 })
 
-describe('POST /login', () => {
-    test('Login Status 200', async() => {
-        const user={
-            username:'diegogod',
-            password:'diego1234'
-        }
-        const {statusCode}=await request(app).post('/api/v1/login/').send(user)
+describe("POST /login", () => {
+    test("Login Status 200", async () => {
+        const user = {
+            username: "diegogod",
+            password: "diego1234",
+        };
+        const { statusCode } = await request(app)
+            .post("/api/v1/login/")
+            .send(user);
         expect(statusCode).toBe(200);
     })
     test('Login Status 400 credenciales incorrectas', async() => {
