@@ -178,7 +178,7 @@ const controller = {
                 }
 
             }catch(error){
-                    console.log(error)
+                    
             resp.status(500).json({message : "Error interno"})
 
             }
@@ -222,7 +222,7 @@ const controller = {
             
 
          }catch(error){
-            console.log(error)
+            
             resp.status(500).json( {message : "Error interno"});
          }
 
