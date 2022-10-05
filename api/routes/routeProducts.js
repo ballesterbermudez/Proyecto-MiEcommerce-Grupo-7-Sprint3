@@ -6,16 +6,16 @@ const verifiers = require('../middelware/verifys');
 
 
 // alias pictures
-route.get('/:id/pictures',verifiers.chekGetsGeneral, pictureController.listPictures);
+route.get('/:id/pictures', pictureController.listPictures);
 
 // rutas products
 route.post('/',verifiers.checkUpdateGeneral, controller.create);
 route.put('/:id',verifiers.checkUpdateGeneral, controller.modify);
 route.delete('/:id',verifiers.checkUpdateGeneral, controller.delete);
-route.get('/search',verifiers.chekGetsGeneral, controller.search);
-route.get('/mostwanted',verifiers.chekGetsGeneral, controller.mostwanted);
-route.get('/:id',verifiers.chekGetsGeneral, controller.details);
-route.get('/', verifiers.chekGetsGeneral,controller.list);
+route.get('/search', controller.search);
+route.get('/mostwanted',controller.mostwanted);
+route.get('/:id',controller.details);
+route.get('/', controller.list);
 
 
 

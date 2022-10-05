@@ -1,26 +1,11 @@
 const verify = {
    
-    chekGetsGeneral: (req,resp,next) =>{
-
-        const token = req.tokens;
-
-        if(token)
-        {
-            next();
-        }
-        else
-        {
-            resp.status(403).json({message : "acceso no autorizado"});
-        }
-
-    },
 
     checkGetUsers: (req,resp,next) =>{
 
         const token = req.tokens
 
-        if(token)
-        {
+        
             if(token.role==='GOD'|| token.role==='ADMIN')
             {
                 next();
@@ -36,11 +21,7 @@ const verify = {
                     resp.status(403).json({message : "acceso no autorizado"});
                 }
             }
-        }
-        else
-        {
-            resp.status(403).json({message : "acceso no autorizado"});
-        }
+      
     },
 
     checkUpdateGeneral: (req,resp,next) => {
@@ -60,8 +41,6 @@ const verify = {
 
         const token = req.tokens
 
-        if(token)
-        {
             if(token.role === 'GOD')
             {
                 next();
@@ -76,11 +55,6 @@ const verify = {
                     resp.status(403).json({message : "acceso no autorizado"});
                 }
             }
-        }
-        else
-        {
-            resp.status(403).json({message : "acceso no autorizado"});
-        }
 
     }
     
