@@ -45,12 +45,11 @@ describe('POST /login', () => {
             username:'',
             password:''
         }
-        sinon.stub(persistance, "searchBYUsername").throws(
-            new Error({
-              response: { status: 500},
-            })
+     sinon.stub(persistance, "searchBYUsername").throws(
+           new Error({
+             response: { status: 500},
+           })
           );
-
           const {statusCode}=await request(app).post('/api/v1/login/').send(body)
           expect(statusCode).toBe(500);
     })
