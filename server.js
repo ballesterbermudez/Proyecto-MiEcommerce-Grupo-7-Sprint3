@@ -6,8 +6,7 @@ const routeLogin = require("./api/routes/routeLogin");
 const routePictures = require("./api/routes/routePictures");
 const routeProducts = require("./api/routes/routeProducts");
 const routeUsers = require("./api/routes/routeUsers");
-const routeCategory = require('./api/routes/routeCategory');
-const routeTest = require('./api/routes/routeTest');
+const routeCategory = require("./api/routes/routeCategory");
 const verifyJWT = require("./api/middelware/verifyJWT");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -25,8 +24,6 @@ app.get("/pai/v1", (req, res) => {
   res.status(200).json("Bienvenido al inicio");
 });
 
-app.use("/test", routeTest);
-
 // Swagger - Documentacion api
 
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -38,7 +35,7 @@ app.use("/api/v1/pictures", verifyJWT, routePictures);
 app.use("/api/v1/products", verifyJWT, routeProducts);
 app.use("/api/v1/users", routeUsers);
 app.use("/api/v1/carts", verifyJWT, routeCarts);
-app.use("/api/v1/category", verifyJWT, routeCategory)
+app.use("/api/v1/category", verifyJWT, routeCategory);
 
 // Server open
 
@@ -58,4 +55,4 @@ app.get("*", (req, res) => {
   res.status(200).redirect("/api/v1");
 });
 
-module.exports = {app, server}
+module.exports = { app, server };

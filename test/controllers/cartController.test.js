@@ -205,4 +205,33 @@ describe("PUT /api/v1/carts/:id", () => {
     });
     expect(cartVacio).toHaveLength(0);
   });
+
+  test("debe devolver un array con un error si no hay stock suficiente", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { body } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([
+        { id_product: 1, quantity: 999 },
+        { id_product: 3, quantity: 1 },
+        { id_product: 4, quantity: 1 },
+      ]);
+    console.log(body);
+    expect(body).toBeInstanceOf(Array);
+
+    await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([]);
+    let cartVacio = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartVacio).toHaveLength(0);
+  });
 });
