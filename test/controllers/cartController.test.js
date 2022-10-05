@@ -97,7 +97,7 @@ describe("PUT /api/v1/carts/:id", () => {
       .send({ id_product: 1, quantity: 2 });
     expect(statusCode).toBe(404);
   });
-  test("debe devolver un json si no encuentra", async () => {
+  test("debe devolver un json si no encuentra user", async () => {
     const idUser = 99999;
     const payload = {
       id: 1,
@@ -111,12 +111,41 @@ describe("PUT /api/v1/carts/:id", () => {
       .send({ id_product: 1, quantity: 2 });
     expect(body).toBeInstanceOf(Object);
   });
-  test.todo("debe crear un carrito en un usuario que no tenga carrito");
-  test.todo(
-    "debe aumentar los elementos de la tabla cart al poner un elemento mas en un carrito ya creado"
-  );
-  test.todo(
-    "debe disminuir los elementos de la tabla cart al eliminar enviar un carrito con un producto menos"
-  );
+
+  test("debe devolver un json si encuentr user", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { body } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send({ id_product: 1, quantity: 2 });
+    expect(body).toBeInstanceOf(Object);
+  });
+  test("debe crear carrito en un usuario", async () => {
+    const idUser = 1;
+    const payload = {
+      id: 1,
+      username: "diegogod",
+      role: "GOD",
+    };
+    const jwt = await gerateJWT(payload);
+    const { body } = await request(app)
+      .put("/api/v1/carts/" + idUser)
+      .auth(jwt, { type: "bearer" })
+      .send([
+        { id_product: 3, quantity: 1 },
+        { id_product: 4, quantity: 1 },
+      ]);
+    let cartConCosas = await db.Cart.findAll({
+      where: { id_usuario: idUser },
+    });
+    expect(cartConCosas).toHaveLength(2);
+  });
+  test.todo("debe borrar un elemento de un carrito");
   test.todo("debe eliminar el carrito de un usuario");
 });
