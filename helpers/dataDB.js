@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const db = require("../api/database/models");
 
+
 // const pictures = [
 //     {
 //         url: "leche.com",
