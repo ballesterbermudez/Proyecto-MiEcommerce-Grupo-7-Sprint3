@@ -3,7 +3,6 @@ const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
 const pictureController = require("../../api/controllers/pictureController");
-const { Data } = require("../../helpers/dataDB");
 
 afterEach(async () => {
     server.close();
@@ -12,10 +11,6 @@ afterEach(async () => {
 afterAll(async () => {
     await db.sequelize.close();
 });
-
-// beforeAll(async() => {
-//     await Data();
-//   })
 
 describe("GET /pictures", () => {
     test("debo devolver un status 200 por query", async () => {
@@ -370,5 +365,13 @@ describe('Prueba errores 500', () => {
             .delete(`/api/v1/pictures/${id}`)
             .auth(jwt, { type: "bearer" });
         expect(statusCode).toBe(500);
+    })
+})
+
+describe('Prueba inicio de api', () => {
+    test('devuelve un status 200', async () => {
+        const {statusCode, body} = await request(app).get('/api/v1');
+        expect(statusCode).toBe(200);
+        expect(body).toBe('Bienvenido al inicio');
     })
 })

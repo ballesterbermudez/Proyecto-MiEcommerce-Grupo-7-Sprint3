@@ -2,7 +2,6 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
-const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();

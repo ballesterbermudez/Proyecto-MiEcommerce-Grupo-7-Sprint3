@@ -2,15 +2,10 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
-const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();
 });
-
-// beforeAll(async() => {
-//   await Data();
-// })
 
 afterAll(async () => {
   await db.sequelize.close();
