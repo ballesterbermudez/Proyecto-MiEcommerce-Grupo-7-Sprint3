@@ -30,8 +30,6 @@ const payloadGuest = {
   role: "GUEST",
 };
 
-//siendo admin listar todo
-
 //LISTAR TODOS LOS USUARIOS
 describe("GET - Listar todos los usuarios - /users", () => {
   test("Debe retornar un statusCode 200 rol GOD", async () => {
@@ -157,7 +155,6 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       password: "123456",
       first_name: "El",
       last_name: "Tester",
-      profilepic: "https://sequelize.com/constraints/",
       id_role: 1,
     };
     const token = await generateJWT(payloadGod);
@@ -610,12 +607,16 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
 //EDITAR USUARIO
 describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
   test("Debe retornar un statusCode 200", async () => {
-    const userId = 10;
+    const { id } = await db.User.findOne({
+      where: { email: "supertest1@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
     const newUserData = {
-      email: "tessdt3@cenco.com",
-      username: "test23sd",
-      password: "testsd1234",
-      id_role: 2,
+        email: "test_editar_1@cenco.com",
+        username: "testEditarOne",
+        password: "123456",
+      id_role: 1,
     };
     const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
@@ -625,13 +626,44 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
     expect(statusCode).toBe(200);
   });
 
-  test("Debe retornar un objeto usuario", async () => {
-    const userId = 10;
+  test("Debe retornar un statusCode 200 rol GUEST", async () => {
+    const userId = 5;
     const newUserData = {
-      email: "tessdt3@cenco.com",
-      username: "test23sd",
-      password: "testsd1234",
-      id_role: 2,
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 403 rol GUEST", async () => {
+    const userId = 1;
+    const newUserData = {
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(403);
+  });
+
+
+  test("Debe retornar un objeto usuario", async () => {
+    const { id } = await db.User.findOne({
+      where: { email: "test_editar_1@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
+    const newUserData = {
+      email: "supertest1@cenco.com",
+      username: "testEditarTwo",
+      password: "123456",
+      id_role: 1,
     };
     const token = await generateJWT(payloadGod);
     const { body } = await request(app)
@@ -644,7 +676,11 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
   });
 
   test("Debe retornar un statusCode 412 por error en ROL", async () => {
-    const userId = 10;
+    const { id } = await db.User.findOne({
+      where: { email: "supertest1@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
     const newUserData = {
       email: "tessdt3@cenco.com",
       username: "test23sd",
@@ -673,6 +709,26 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       .auth(token, { type: "bearer" })
       .send(newUserData);
     expect(statusCode).toBe(404);
+  });
+
+  test("Debe retornar un statusCode 401 validate username menor de 4", async () => {
+    const { id } = await db.User.findOne({
+      where: { email: "supertest1@cenco.com" },
+      attributes: ["id"],
+    });
+    const userId = id;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "ZZ",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payloadGod);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(401);
   });
 });
 

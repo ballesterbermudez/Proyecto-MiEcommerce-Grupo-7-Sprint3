@@ -17,7 +17,8 @@ const userConverter = (user) => {
       profilepic: user.profilepic,
     };
     return userDT;
-}};
+  }
+};
 const userRolConverter = (user) => {
   if (user) {
     const userDT = {
@@ -236,13 +237,9 @@ const usersController = {
             cart[i].Cart.id_product
           );
           const nuevoStock = producto.stock + cart[i].Cart.quantity;
-          await persistance.updateData(
-            "Product",
-            producto.id,
-            {
-              stock: nuevoStock,
-            },
-          );
+          await persistance.updateData("Product", producto.id, {
+            stock: nuevoStock,
+          });
           await persistance.deleteOneProduct(req.params.userId, producto.id);
         }
 
