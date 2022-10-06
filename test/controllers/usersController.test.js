@@ -24,18 +24,17 @@ const payloadGod = {
 };
 
 const payloadAdmin = {
-    id: 2,
-    username: "hernana",
-    role: "ADMIN",
-  };
+  id: 2,
+  username: "hernana",
+  role: "ADMIN",
+};
 
-  const payloadGuest = {
-    id: 5,
-    username: "juven",
-    role: "GUEST",
-  };
+const payloadGuest = {
+  id: 5,
+  username: "juven",
+  role: "GUEST",
+};
 
-//siendo guest listar mi user y listar todo
 //siendo admin listar todo
 
 //LISTAR TODOS LOS USUARIOS
@@ -62,15 +61,6 @@ describe("GET - Listar todos los usuarios - /users", () => {
       .get("/api/v1/users")
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(403);
-  });
-
-  test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
-    const token = await generateJWT(payloadGod);
-    await db.sequelize.close();
-    const { statusCode } = await request(app)
-      .get("/api/v1/users")
-      .auth(token, { type: "bearer" });
-    expect(statusCode).toBe(500);
   });
 
   test("Debe retornar un array con usuarios", async () => {
@@ -142,16 +132,6 @@ describe("GET - Listar un usuario por id - /users/:userId", () => {
       .get(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(401);
-  });
-
-  test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
-    const userId = "1";
-    const token = await generateJWT(payloadGod);
-    await db.sequelize.close();
-    const { statusCode } = await request(app)
-      .get(`/api/v1/users/${userId}`)
-      .auth(token, { type: "bearer" });
-    expect(statusCode).toBe(500);
   });
 });
 
@@ -227,25 +207,6 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       .auth(token, { type: "bearer" })
       .send(newUser);
     expect(statusCode).toBe(412);
-  });
-
-  test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
-    const newUser = {
-      email: "supertest@cenco.com",
-      username: "jest",
-      password: "123456",
-      first_name: "El",
-      last_name: "Tester",
-      profilepic: "https://sequelize.com/constraints/",
-      id_role: 1,
-    };
-    const token = await generateJWT(payloadGod);
-    db.sequelize.close();
-    const { statusCode } = await request(app)
-      .post(`/api/v1/users/`)
-      .auth(token, { type: "bearer" })
-      .send(newUser);
-    expect(statusCode).toBe(500);
   });
 
   //VALIDATE ENEMAIL
@@ -718,29 +679,12 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       .send(newUserData);
     expect(statusCode).toBe(404);
   });
-
-  test.skip("Debe retornar un statusCode 500 error en la base de datos", async () => {
-    const userId = 10;
-    const newUserData = {
-      email: "tessdt3@cenco.com",
-      username: "test23sd",
-      password: "testsd1234",
-      id_role: 2,
-    };
-    const token = await generateJWT(payloadGod);
-    await db.sequelize.close();
-    const { statusCode } = await request(app)
-      .put(`/api/v1/users/${userId}`)
-      .auth(token, { type: "bearer" })
-      .send(newUserData);
-    expect(statusCode).toBe(500);
-  });
 });
 
 //ELIMINIAR USUARIO
 describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", () => {
   test("Debe retornar un statusCode 200 ", async () => {
-    const {id} = await db.User.findOne({
+    const { id } = await db.User.findOne({
       where: { email: "supertest1@cenco.com" },
       attributes: ["id"],
     });
@@ -753,7 +697,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
   });
 
   test("Debe retornar un obeto usuario", async () => {
-    const {id} = await db.User.findOne({
+    const { id } = await db.User.findOne({
       where: { email: "supertest2@cenco.com" },
       attributes: ["id"],
     });
@@ -775,11 +719,65 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(404);
   });
+});
 
-  test.skip("Debe retornar un statusCode 500", async () => {
-    const userId = 999;
+//CIERRO LA CONEXION CON LA BASE PARA SIMULAR ERROR
+describe("Deben retornar statusCode 500", () => {
+  test("Debe retornar un statusCode 500 error en la base de datos", async () => {
     const token = await generateJWT(payloadGod);
     db.sequelize.close();
+    const { statusCode } = await request(app)
+      .get("/api/v1/users")
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(500);
+  });
+
+  test("Debe retornar un statusCode 500", async () => {
+    const userId = "1";
+    const token = await generateJWT(payloadGod);
+    const { statusCode } = await request(app)
+      .get(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" });
+    expect(statusCode).toBe(500);
+  });
+
+  test("Debe retornar un statusCode 500", async () => {
+    const newUser = {
+      email: "supertest@cenco.com",
+      username: "jest",
+      password: "123456",
+      first_name: "El",
+      last_name: "Tester",
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,
+    };
+    const token = await generateJWT(payloadGod);
+    const { statusCode } = await request(app)
+      .post(`/api/v1/users/`)
+      .auth(token, { type: "bearer" })
+      .send(newUser);
+    expect(statusCode).toBe(500);
+  });
+
+  test("Debe retornar un statusCode 500 error en la base de datos", async () => {
+    const userId = 10;
+    const newUserData = {
+      email: "tessdt3@cenco.com",
+      username: "test23sd",
+      password: "testsd1234",
+      id_role: 2,
+    };
+    const token = await generateJWT(payloadGod);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(500);
+  });
+
+  test("Debe retornar un statusCode 500", async () => {
+    const userId = 999;
+    const token = await generateJWT(payloadGod);
     const { statusCode } = await request(app)
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
