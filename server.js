@@ -13,7 +13,6 @@ const YAML = require("yamljs");
 const swaggerDocument = YAML.load("./swagger.yaml");
 
 const db = require("./api/database/models");
-const { Model } = require("sequelize");
 require("dotenv").config();
 
 app.use(express.json());

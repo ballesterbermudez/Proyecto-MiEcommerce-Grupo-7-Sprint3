@@ -4,6 +4,7 @@ const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
 
 
+
 afterEach(() => {
     server.close();
 });
@@ -12,6 +13,8 @@ afterEach(() => {
 afterAll(async () => {
     await db.sequelize.close();
 })
+
+
 
 describe('Listar categorias', () => {
     it('obtener listado de categorias', async () => {
@@ -158,6 +161,7 @@ describe('Borrar una categoria', () => {
 
 describe('Prueba de status 500', () => {
     beforeAll(async () => {
+
         await db.sequelize.close();
     })
     test('GET /category', async () => {

@@ -1,8 +1,12 @@
+
 const jwt=require('../../helpers/generateToken')
-const {app, server} = require('../../server');
-beforeEach(() => {
+const { server} = require('../../server');
+
+
+beforeEach(async () => {
     server.close();
 });
+
 test('Devolver el token',async() => {
     const payload={
         id: 1,

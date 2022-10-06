@@ -2,13 +2,18 @@ const request = require('supertest');
 const db = require('../../api/database/models');
 const {app, server} = require('../../server');
 
+
 afterEach(() => {
     server.close();
 });
 
 afterAll(async () => {
+
     await db.sequelize.close();
 })
+
+
+
 
 describe("POST /login", () => {
     test("Login Status 200", async () => {

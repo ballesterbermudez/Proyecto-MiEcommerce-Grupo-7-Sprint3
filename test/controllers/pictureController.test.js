@@ -4,6 +4,7 @@ const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
 const pictureController = require("../../api/controllers/pictureController");
 
+
 afterEach(async () => {
     server.close();
 });
@@ -11,6 +12,8 @@ afterEach(async () => {
 afterAll(async () => {
     await db.sequelize.close();
 });
+
+
 
 describe("GET /pictures", () => {
     test("debo devolver un status 200 por query", async () => {
@@ -216,7 +219,7 @@ describe('PUT /pictures/:id', () => {
             expect(statusCode).toBe(400);
     })
     test('devuelve un status 404', async () => {
-        const id = 1;
+        const id = -1;
         const payload = {
             id: 1,
             username: "diegogod",
@@ -227,7 +230,7 @@ describe('PUT /pictures/:id', () => {
             description: 'whisky de calidad',
         };
         const jwt = await gerateJWT(payload);
-        const { statusCode } = await request(app)
+        const {statusCode} = await request(app)
             .put(`/api/v1/pictures/${id}`)
             .auth(jwt, { type: "bearer" }).send(picture);
             expect(statusCode).toBe(404);
@@ -266,7 +269,7 @@ describe('DELETE /pictures/:id', () => {
             expect(statusCode).toBe(200);
     })
     test('devuelve un status 404', async () => {
-        let id = 1;
+        let id = -1;
         const payload = {
             id: 1,
             username: "diegogod",
@@ -294,6 +297,7 @@ describe("getPicture controlador picture", () => {
 
 describe('Prueba errores 500', () => {
     beforeAll(async () => {
+
         await db.sequelize.close();
     })
     test('GET /pictures', async () => {

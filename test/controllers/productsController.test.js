@@ -117,7 +117,7 @@ describe( 'Creacion de productos', () => {
 describe( 'Modificacion de Productos', () => {
     it('modificamos un producto existente',async () =>{
         const token = await generateJWT({role: 'ADMIN'})
-        const id = 30
+        const id = 3
         const newData = {
             "title": 'testProductModification',
             "price": 120,
@@ -145,7 +145,7 @@ describe( 'Modificacion de Productos', () => {
     })
     it('encontramos un error de validacion',async () =>{
         const token = await generateJWT({role: 'GOD'})
-        const id = 30
+        const id = 3
         const newData = {
             "title": 'testProductModification',
             "price": -120,
@@ -193,9 +193,9 @@ describe('Buscamos productos mostwanted', () => {
         expect(resp.status).toBe(404) 
         expect(resp.body.message).toBe("No hubieron resultados")         
     })
-    it('obtenemos resultados de la busqueda', async() =>{
+    it('Obtenemos resultados de la busqueda', async() =>{
         const token = await generateJWT({role: 'GUEST'})
-        await db.Product.update({mostwanted: true}, {where: {id: 30}})
+        await db.Product.update({mostwanted: true}, {where: {id: 3}})
             const resp = await request(app)
                 .get('/api/v1/products/mostwanted')
                 .auth(token, {type: 'bearer'})
@@ -260,6 +260,7 @@ describe('Solicitudes no autorizadas', ()=> {
 describe('Errores de acceso a bd', () => {
     
     it('listar', async () =>{
+
         await db.sequelize.close()
         const token = await generateJWT({role: 'GUEST'})
         const resp = await request(app)

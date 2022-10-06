@@ -124,7 +124,7 @@ const usersController = {
           id_role: req.body.id_role,
         };
         //GUARDO EL USUARIO EN LA BASE DE DATOS
-        await persistance.inster("User", newUser);
+        await persistance.inster("User", newUser)
         //PASO EL USUARIO A USUARIO DT PARA RETORNAR SIN PASS
         const newUserDT = userConverter(newUser);
 
