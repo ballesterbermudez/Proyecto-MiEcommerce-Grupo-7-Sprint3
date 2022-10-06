@@ -2,13 +2,15 @@ const request = require('supertest')
 const {app, server} = require('../../server')
 const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
-
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
     server.close();
 });
 
-
+beforeAll(async() => {
+    await Data();
+  })
 
 describe( 'Listado de productos', () => {
    
@@ -260,6 +262,7 @@ describe('Solicitudes no autorizadas', ()=> {
 describe('Errores de acceso a bd', () => {
     
     it('listar', async () =>{
+        await db.sequelize.query("drop database if exists mi_ecommerce_test;")
         await db.sequelize.close()
         const token = await generateJWT({role: 'GUEST'})
         const resp = await request(app)

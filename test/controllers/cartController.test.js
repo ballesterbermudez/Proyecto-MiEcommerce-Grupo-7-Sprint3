@@ -2,7 +2,7 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
-const cartController = require("../../api/controllers/cartController");
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();
@@ -11,6 +11,10 @@ afterEach(() => {
 afterAll(async () => {
   await db.sequelize.close();
 });
+
+beforeAll(async() => {
+  await Data();
+})
 
 describe("GET /api/v1/carts/:id", () => {
   test("debe devolver status 200", async () => {
@@ -238,6 +242,7 @@ describe("PUT /api/v1/carts/:id", () => {
 
 describe("Prueba de status 500", () => {
   beforeAll(async () => {
+    await db.sequelize.query("drop database if exists mi_ecommerce_test;")
     await db.sequelize.close();
   });
 

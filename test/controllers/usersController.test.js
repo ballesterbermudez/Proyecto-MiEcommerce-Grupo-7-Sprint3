@@ -2,14 +2,22 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
-const persistance = require("../../api/persistence/persistence");
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();
 });
+
+beforeAll(async() => {
+  await Data();
+})
+
 afterAll(async () => {
   await db.sequelize.close();
 });
+
+
+
 
 //USADO PARA CREAR TOKEN
 const payloadGod = {
@@ -146,8 +154,8 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       .auth(token, { type: "bearer" })
       .send(newUser);
     expect(statusCode).toBe(200);
+ 
   });
-
   test("Debe retornar un objeto usuario", async () => {
     const newUser = {
       email: "supertest2@cenco.com",
@@ -155,18 +163,19 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       password: "123456",
       first_name: "El",
       last_name: "Tester",
-      id_role: 1,
+      profilepic: "https://sequelize.com/constraints/",
+      id_role: 1,   
     };
     const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
       .send(newUser);
-    expect(body.user).toEqual(
+      expect(body.user).toEqual(
       expect.objectContaining({ email: expect.any(String) })
     );
   });
-
+ 
   test("Debe retornar un statusCode 412 por error en ROL", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -606,6 +615,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
 
 //EDITAR USUARIO
 describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
+
   test("Debe retornar un statusCode 200", async () => {
     const { id } = await db.User.findOne({
       where: { email: "supertest1@cenco.com" },
@@ -625,6 +635,33 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
       .send(newUserData);
     expect(statusCode).toBe(200);
   });
+
+  test("Debe retornar un statusCode 200 rol GUEST", async () => {
+    const userId = 5;
+    const newUserData = {
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 403 rol GUEST", async () => {
+    const userId = 1;
+    const newUserData = {
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(403);
+  });
+
 
   test("Debe retornar un objeto usuario", async () => {
     const { id } = await db.User.findOne({
@@ -719,7 +756,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(200);
   });
-
+ 
   test("Debe retornar un obeto usuario", async () => {
     const { id } = await db.User.findOne({
       where: { email: "supertest2@cenco.com" },
@@ -749,12 +786,13 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
 describe("Deben retornar statusCode 500", () => {
   test("Debe retornar un statusCode 500 error en la base de datos", async () => {
     const token = await generateJWT(payloadGod);
+    await db.sequelize.query("drop database if exists mi_ecommerce_test;")
     db.sequelize.close();
     const { statusCode } = await request(app)
       .get("/api/v1/users")
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(500);
-  });
+  }); 
 
   test("Debe retornar un statusCode 500", async () => {
     const userId = "1";

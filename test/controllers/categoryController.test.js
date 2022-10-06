@@ -2,6 +2,7 @@ const request = require('supertest')
 const {app, server} = require('../../server')
 const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
+const { Data } = require('../../helpers/dataDB');
 
 
 afterEach(() => {
@@ -11,6 +12,10 @@ afterEach(() => {
 
 afterAll(async () => {
     await db.sequelize.close();
+})
+
+beforeAll(async () => {
+    await Data();
 })
 
 describe('Listar categorias', () => {
@@ -158,6 +163,7 @@ describe('Borrar una categoria', () => {
 
 describe('Prueba de status 500', () => {
     beforeAll(async () => {
+        await db.sequelize.query("drop database if exists mi_ecommerce_test;")
         await db.sequelize.close();
     })
     test('GET /category', async () => {
