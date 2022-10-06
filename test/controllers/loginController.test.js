@@ -7,7 +7,7 @@ afterEach(() => {
 });
 
 afterAll(async () => {
-    // await db.sequelize.query("drop database if exists mi_ecommerce_test;")
+
     await db.sequelize.close();
 })
 
