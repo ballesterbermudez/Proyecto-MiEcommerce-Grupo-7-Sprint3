@@ -8,8 +8,10 @@ afterEach(() => {
 });
 
 afterAll(async () => {
+
     await db.sequelize.close();
 })
+
 
 
 

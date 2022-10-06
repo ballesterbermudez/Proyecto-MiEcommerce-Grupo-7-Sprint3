@@ -13,6 +13,7 @@ afterAll(async () => {
 });
 
 
+
 describe("GET /api/v1/carts/:id", () => {
   test("debe devolver status 200", async () => {
     const idUser = 1;
@@ -239,6 +240,8 @@ describe("PUT /api/v1/carts/:id", () => {
 
 describe("Prueba de status 500", () => {
   beforeAll(async () => {
+
+
     await db.sequelize.close();
   });
 
