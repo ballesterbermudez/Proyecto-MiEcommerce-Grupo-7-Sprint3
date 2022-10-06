@@ -17,9 +17,7 @@ const userConverter = (user) => {
       profilepic: user.profilepic,
     };
     return userDT;
-  }
-  return null;
-};
+}};
 const userRolConverter = (user) => {
   if (user) {
     const userDT = {
@@ -33,7 +31,6 @@ const userRolConverter = (user) => {
     };
     return userDT;
   }
-  return null;
 };
 
 const usersController = {
