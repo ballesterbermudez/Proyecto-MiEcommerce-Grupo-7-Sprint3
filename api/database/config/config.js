@@ -13,7 +13,7 @@ module.exports = {
   test: {
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: null,
+    database: process.env.DB_NAME_TEST,
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: "mysql",
