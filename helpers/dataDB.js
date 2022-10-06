@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const db = require("../api/database/models");
-const persistence = require("../api/persistence/persistence");
 
 // const pictures = [
 //     {

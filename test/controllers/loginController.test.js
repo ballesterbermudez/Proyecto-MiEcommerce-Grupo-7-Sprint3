@@ -1,13 +1,14 @@
 const request = require('supertest');
 const db = require('../../api/database/models');
-const { Data } = require('../../helpers/dataDB');
 const {app, server} = require('../../server');
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
     server.close();
 });
 
 afterAll(async () => {
+    await db.sequelize.query("drop database if exists mi_ecommerce_test;")
     await db.sequelize.close();
 })
 

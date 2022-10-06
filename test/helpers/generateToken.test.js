@@ -1,6 +1,8 @@
-const { Data } = require('../../helpers/dataDB');
+
 const jwt=require('../../helpers/generateToken')
-const {app, server} = require('../../server');
+const { server} = require('../../server');
+
+
 beforeEach(async () => {
     server.close();
 });

@@ -2,7 +2,6 @@ const request = require("supertest");
 const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
-const cartController = require("../../api/controllers/cartController");
 const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
@@ -243,6 +242,7 @@ describe("PUT /api/v1/carts/:id", () => {
 
 describe("Prueba de status 500", () => {
   beforeAll(async () => {
+    await db.sequelize.query("drop database if exists mi_ecommerce_test;")
     await db.sequelize.close();
   });
 
