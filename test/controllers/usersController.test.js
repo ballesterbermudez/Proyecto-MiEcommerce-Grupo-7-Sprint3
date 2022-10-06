@@ -626,6 +626,33 @@ describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
     expect(statusCode).toBe(200);
   });
 
+  test("Debe retornar un statusCode 200 rol GUEST", async () => {
+    const userId = 5;
+    const newUserData = {
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(200);
+  });
+
+  test("Debe retornar un statusCode 403 rol GUEST", async () => {
+    const userId = 1;
+    const newUserData = {
+        first_name: "Juan"
+    };
+    const token = await generateJWT(payloadGuest);
+    const { statusCode } = await request(app)
+      .put(`/api/v1/users/${userId}`)
+      .auth(token, { type: "bearer" })
+      .send(newUserData);
+    expect(statusCode).toBe(403);
+  });
+
+
   test("Debe retornar un objeto usuario", async () => {
     const { id } = await db.User.findOne({
       where: { email: "test_editar_1@cenco.com" },
