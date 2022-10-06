@@ -2,13 +2,16 @@ const request = require('supertest')
 const {app, server} = require('../../server')
 const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
+const { Data } = require('../../helpers/dataDB');
 
 
 afterEach(() => {
     server.close();
 });
 
-
+beforeAll(async() => {
+    await Data();
+  })
 
 describe( 'Listado de productos', () => {
    

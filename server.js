@@ -14,6 +14,7 @@ const swaggerDocument = YAML.load("./swagger.yaml");
 
 const db = require("./api/database/models");
 const { Model } = require("sequelize");
+const { Data } = require("./helpers/dataDB");
 require("dotenv").config();
 
 app.use(express.json());
@@ -42,6 +43,7 @@ app.use("/api/v1/category", verifyJWT, routeCategory);
 const server = app.listen(process.env.PORT, async () => {
   try {
     await db.sequelize.authenticate();
+    Data()
     console.log("Connection has been established successfully.");
   } catch (error) {
     console.error("Unable to connect to the database:", error.message);

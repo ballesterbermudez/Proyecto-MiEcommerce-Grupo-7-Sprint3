@@ -1,8 +1,10 @@
+const { Data } = require('../../helpers/dataDB');
 const jwt=require('../../helpers/generateToken')
 const {app, server} = require('../../server');
-beforeEach(() => {
+beforeEach(async () => {
     server.close();
 });
+
 test('Devolver el token',async() => {
     const payload={
         id: 1,

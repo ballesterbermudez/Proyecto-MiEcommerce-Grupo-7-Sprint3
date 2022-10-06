@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --verbose --watchAll --maxWorkers=1",
+    "test": "jest --verbose --watchAll --maxWorkers=1 --silent",
     "coverage": "jest --coverage --maxWorkers=1",
     "start": "node server.js"
   },

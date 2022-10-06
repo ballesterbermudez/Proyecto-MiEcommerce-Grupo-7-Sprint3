@@ -1,5 +1,6 @@
 const request = require('supertest');
 const db = require('../../api/database/models');
+const { Data } = require('../../helpers/dataDB');
 const {app, server} = require('../../server');
 
 afterEach(() => {
@@ -9,6 +10,10 @@ afterEach(() => {
 afterAll(async () => {
     await db.sequelize.close();
 })
+
+beforeAll(async() => {
+    await Data();
+  })
 
 describe("POST /login", () => {
     test("Login Status 200", async () => {

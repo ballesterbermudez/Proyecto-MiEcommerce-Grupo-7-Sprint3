@@ -3,6 +3,7 @@ const db = require("../../api/database/models");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
 const persistance = require("../../api/persistence/persistence");
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();
@@ -10,6 +11,10 @@ afterEach(() => {
 afterAll(async () => {
   await db.sequelize.close();
 });
+
+beforeAll(async() => {
+  await Data();
+})
 
 //USADO PARA CREAR TOKEN
 const payloadGod = {
