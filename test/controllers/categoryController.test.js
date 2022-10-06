@@ -163,7 +163,6 @@ describe('Borrar una categoria', () => {
 
 describe('Prueba de status 500', () => {
     beforeAll(async () => {
-        await db.sequelize.query('DROP DATABASE `mi_ecommerce_test`')
         await db.sequelize.close();
     })
     test('GET /category', async () => {

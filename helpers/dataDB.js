@@ -136,6 +136,7 @@ let querys = data.split(/;\n/)
 const Data = async () => {
     
     try {
+        console.log(querys);
         for( let i = 0 ; i< querys.length ; i++) {
             await db.sequelize.query(querys[i])
         }
