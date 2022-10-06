@@ -66,7 +66,7 @@ describe( 'Detalle de productos', () => {
 })
 
 describe( 'Creacion de productos', () => {
-    it.skip('crear un prodocto nuevo', async ()=>{
+    it('crear un prodocto nuevo', async ()=>{
         const token = await generateJWT({role: 'GOD'})
         const newProduct = { 
             "title": 'testProduct',
@@ -186,7 +186,7 @@ describe('Buscamos por keyword', () =>{
 describe('Buscamos productos mostwanted', () => {
     it('No obtenemos resultados de la busqueda', async() =>{
         const token = await generateJWT({role: 'GUEST'})
-        await  db.Product.update({mostwanted: false}, {where: {id: 30}})
+        await  db.Product.update({mostwanted: false}, {where: {id: {[db.Sequelize.Op.gt] : 0}}})
         const resp = await request(app)
             .get('/api/v1/products/mostwanted')
             .auth(token, {type: 'bearer'})
@@ -338,6 +338,19 @@ describe('Errores de acceso a bd', () => {
             .auth(token, {type: 'bearer'})
         expect(resp.status).toBe(500) 
         expect(resp.body.message).toBe("Error interno")
+    })
+})
+
+describe('Equivocarse en la ruta', () => {
+    it('ruta equivocada', async () =>{
+        await db.sequelize.close()
+        const token = await generateJWT({role: 'GUEST'})
+        const resp = await request(app)
+            .get('/api/v1/asdfghjk')
+            .auth(token, {type: 'bearer'})
+            .send()
+        expect(resp.status).toBe(302) 
+        
     })
 })
 
