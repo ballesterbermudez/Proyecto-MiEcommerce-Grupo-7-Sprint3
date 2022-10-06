@@ -7,13 +7,16 @@ const { Data } = require("../../helpers/dataDB");
 afterEach(() => {
   server.close();
 });
-afterAll(async () => {
-  await db.sequelize.close();
-});
 
 beforeAll(async() => {
   await Data();
 })
+
+afterAll(async () => {
+  await db.sequelize.close();
+});
+
+
 
 
 //USADO PARA CREAR TOKEN
@@ -153,8 +156,8 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       .auth(token, { type: "bearer" })
       .send(newUser);
     expect(statusCode).toBe(200);
+ 
   });
-
   test("Debe retornar un objeto usuario", async () => {
     const newUser = {
       email: "supertest2@cenco.com",
@@ -163,18 +166,18 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       first_name: "El",
       last_name: "Tester",
       profilepic: "https://sequelize.com/constraints/",
-      id_role: 1,
+      id_role: 1,   
     };
     const token = await generateJWT(payloadGod);
     const { body } = await request(app)
       .post(`/api/v1/users/`)
       .auth(token, { type: "bearer" })
       .send(newUser);
-    expect(body.user).toEqual(
+      expect(body.user).toEqual(
       expect.objectContaining({ email: expect.any(String) })
     );
   });
-
+ 
   test("Debe retornar un statusCode 412 por error en ROL", async () => {
     const newUser = {
       email: "supertest@cenco.com",
@@ -614,6 +617,7 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
 
 //EDITAR USUARIO
 describe("PUT - Editar un usuario de la base de datos - /users/:userId", () => {
+
   test("Debe retornar un statusCode 200", async () => {
     const userId = 10;
     const newUserData = {
@@ -695,7 +699,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(200);
   });
-
+ 
   test("Debe retornar un obeto usuario", async () => {
     const { id } = await db.User.findOne({
       where: { email: "supertest2@cenco.com" },
@@ -731,7 +735,7 @@ describe("Deben retornar statusCode 500", () => {
       .get("/api/v1/users")
       .auth(token, { type: "bearer" });
     expect(statusCode).toBe(500);
-  });
+  }); 
 
   test("Debe retornar un statusCode 500", async () => {
     const userId = "1";
