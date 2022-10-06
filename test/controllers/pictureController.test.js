@@ -13,9 +13,7 @@ afterAll(async () => {
     await db.sequelize.close();
 });
 
-beforeAll(async() => {
-    await Data();
-  })
+
 
 describe("GET /pictures", () => {
     test("debo devolver un status 200 por query", async () => {
@@ -299,7 +297,6 @@ describe("getPicture controlador picture", () => {
 
 describe('Prueba errores 500', () => {
     beforeAll(async () => {
-        await db.sequelize.query("drop database if exists mi_ecommerce_test;")
         await db.sequelize.close();
     })
     test('GET /pictures', async () => {
