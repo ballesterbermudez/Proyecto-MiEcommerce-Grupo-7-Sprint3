@@ -13,9 +13,9 @@ afterAll(async () => {
     await db.sequelize.close();
 });
 
-beforeAll(async() => {
-    await Data();
-  })
+// beforeAll(async() => {
+//     await Data();
+//   })
 
 describe("GET /pictures", () => {
     test("debo devolver un status 200 por query", async () => {
@@ -221,7 +221,7 @@ describe('PUT /pictures/:id', () => {
             expect(statusCode).toBe(400);
     })
     test('devuelve un status 404', async () => {
-        const id = 1;
+        const id = -1;
         const payload = {
             id: 1,
             username: "diegogod",
@@ -271,7 +271,7 @@ describe('DELETE /pictures/:id', () => {
             expect(statusCode).toBe(200);
     })
     test('devuelve un status 404', async () => {
-        let id = 1;
+        let id = -1;
         const payload = {
             id: 1,
             username: "diegogod",
@@ -299,7 +299,7 @@ describe("getPicture controlador picture", () => {
 
 describe('Prueba errores 500', () => {
     beforeAll(async () => {
-        await db.sequelize.query("drop database if exists mi_ecommerce_test;")
+        // await db.sequelize.query("drop database if exists mi_ecommerce_test;")
         await db.sequelize.close();
     })
     test('GET /pictures', async () => {
