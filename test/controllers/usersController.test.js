@@ -4,14 +4,15 @@ const { Data } = require("../../helpers/dataDB");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
 
-
 afterEach(() => {
   server.close();
 });
 
+
 beforeAll(async ()=> {
   await Data()
 })
+
 
 
 afterAll(async () => {

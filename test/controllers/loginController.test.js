@@ -3,6 +3,7 @@ const db = require('../../api/database/models');
 const {app, server} = require('../../server');
 const { Data } = require("../../helpers/dataDB");
 
+
 afterEach(() => {
     server.close();
 });
@@ -14,9 +15,6 @@ afterAll(async () => {
 
     await db.sequelize.close();
 })
-
-
-
 
 describe("POST /login", () => {
     test("Login Status 200", async () => {
