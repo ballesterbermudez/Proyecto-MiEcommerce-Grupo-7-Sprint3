@@ -7,7 +7,7 @@ CREATE TABLE `roles` (
   `role` varchar(10) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `role` (`role`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -23,14 +23,14 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`),
   KEY `users_fk0` (`id_role`),
   CONSTRAINT `users_fk0` FOREIGN KEY (`id_role`) REFERENCES `roles` (`id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=287 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 DROP TABLE IF EXISTS `categories`;
 CREATE TABLE `categories` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `title` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 DROP TABLE IF EXISTS `products`;
 CREATE TABLE `products` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -43,7 +43,7 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`),
   KEY `products_fk0` (`id_category`),
   CONSTRAINT `products_fk0` FOREIGN KEY (`id_category`) REFERENCES `categories` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 DROP TABLE IF EXISTS `pictures`;
 CREATE TABLE `pictures` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -54,7 +54,7 @@ CREATE TABLE `pictures` (
   UNIQUE KEY `url` (`url`),
   KEY `pictures_fk0` (`id_product`),
   CONSTRAINT `pictures_fk0` FOREIGN KEY (`id_product`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 DROP TABLE IF EXISTS `carts`;
 CREATE TABLE `carts` (
   `id_usuario` int NOT NULL,
@@ -67,7 +67,7 @@ CREATE TABLE `carts` (
   CONSTRAINT `carts_fk1` FOREIGN KEY (`id_product`) REFERENCES `products` (`id`),
   CONSTRAINT `carts_fk10` FOREIGN KEY (`id_usuario`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `carts_fk11` FOREIGN KEY (`id_product`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 LOCK TABLES `roles` WRITE;
 INSERT INTO `roles` VALUES (2,'ADMIN'),(1,'GOD'),(3,'GUEST');
 UNLOCK TABLES;
