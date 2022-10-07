@@ -3,11 +3,14 @@ const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
 const pictureController = require("../../api/controllers/pictureController");
-
+const { Data } = require("../../helpers/dataDB");
 
 afterEach(async () => {
     server.close();
 });
+beforeAll(async ()=> {
+    await Data()
+  })
 
 afterAll(async () => {
     await db.sequelize.close();
@@ -297,7 +300,7 @@ describe("getPicture controlador picture", () => {
 
 describe('Prueba errores 500', () => {
     beforeAll(async () => {
-
+        db.sequelize.query('drop database `mi_ecommerce_test`')
         await db.sequelize.close();
     })
     test('GET /pictures', async () => {

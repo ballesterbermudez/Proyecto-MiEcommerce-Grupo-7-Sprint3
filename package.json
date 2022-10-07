@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --verbose --watchAll  -i --runInBand --silent",
-    "coverage": "jest --coverage --maxWorkers=1",
+    "coverage": "jest --coverage --maxWorkers=1 --silent",
     "start": "node server.js"
   },
   "author": "",

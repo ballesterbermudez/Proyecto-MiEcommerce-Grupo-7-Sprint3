@@ -2,12 +2,15 @@ const request = require('supertest')
 const {app, server} = require('../../server')
 const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
-
+const { Data } = require("../../helpers/dataDB");
 
 
 afterEach(() => {
     server.close();
 });
+beforeAll(async ()=> {
+    await Data()
+  })
 
 
 afterAll(async () => {
@@ -161,7 +164,7 @@ describe('Borrar una categoria', () => {
 
 describe('Prueba de status 500', () => {
     beforeAll(async () => {
-
+        db.sequelize.query('drop database `mi_ecommerce_test`')
         await db.sequelize.close();
     })
     test('GET /category', async () => {

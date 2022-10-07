@@ -130,7 +130,7 @@ const db = require("../api/database/models");
 // (57, 2, 9, '2022-09-28 00:51:52'),
 // (57, 3, 4, '2022-09-28 00:51:52');
 
-const data = fs.readFileSync(path.resolve(__dirname, '..', 'api', 'database', 'migration', 'dump_test.sql')).toString('utf-8')
+const data = fs.readFileSync(path.resolve(__dirname, '..', 'api', 'database', 'migrations', 'dump_test.sql')).toString('utf-8')
 let querys = data.split(/;\n/)
 
 const Data = async () => {
@@ -146,6 +146,7 @@ const Data = async () => {
         throw err;
     }
 };
+
 
 module.exports = {
     Data,
