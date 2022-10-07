@@ -81,7 +81,11 @@ const cartController = {
             const cart = await persistance.getCartByUserID(req.params.id);
 
             if (cart) {
-                res.send(cart);
+                if(Object.keys(cart.cart).length === 0) {
+                    res.status(200).send('El carrito esta vacio');
+                } else {
+                    res.status(200).send(cart)
+                }
             } else {
                 res.status(404).json({
                     ok: false,
