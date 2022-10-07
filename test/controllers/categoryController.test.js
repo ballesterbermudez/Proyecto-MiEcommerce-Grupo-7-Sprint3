@@ -3,6 +3,7 @@ const {app, server} = require('../../server')
 const db = require('../../api/database/models')
 const generateJWT = require('../../helpers/generateToken');
 const { Data } = require("../../helpers/dataDB");
+const persistence = require('../../api/persistence/persistence');
 
 afterEach(() => {
     server.close();
@@ -209,5 +210,33 @@ describe('Prueba de status 500', () => {
             .auth(token, {type: 'bearer'})
         expect(statusCode).toBe(500)
         expect(body).toBeInstanceOf(Object)
+    })
+    test('Prueba de error en delete - persistence', async () => {
+        try {
+            await persistence.delete('Category', 4);
+        } catch (error) {
+            expect(error.name).toBe('Error')
+        }
+    })
+    test('Prueba de error en deleteOneProduct - persistence', async () => {
+        try {
+            await persistence.deleteOneProduct(4, 4);
+        } catch (error) {
+            expect(error.name).toBe('Error')
+        }
+    })
+    test('Prueba de error en getCartByUserId - persistence', async () => {
+        try {
+            await persistence.getCartByUserID(4);
+        } catch (error) {
+            expect(error.name).toBe('Error')
+        }
+    })
+    test('Prueba de error en Data - dataDB', async () => {
+        try {
+            await Data();
+        } catch (error) {
+            expect(error.name).toBe('Error')
+        }
     })
 })
