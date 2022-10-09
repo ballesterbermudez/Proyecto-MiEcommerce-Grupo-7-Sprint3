@@ -18,7 +18,7 @@ const pictureController = {
         return res.status(404).json("No se encontro el producto");
       }
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       res.status(500).json("No se pudo acceder a la informacion");
     }
   },
@@ -31,7 +31,7 @@ const pictureController = {
         return res.status(404).json("no se encontro la imagen");
       }
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       res.status(500).json("No se pudo acceder a la informacion");
     }
   },
@@ -105,7 +105,7 @@ const pictureController = {
         res.status(404).json('no se encontro la picture');
       }
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         res.status(500).json("No se pudo acceder a la informacion");
     }
   },

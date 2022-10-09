@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest --verbose --watchAll  -i --runInBand ",
-    "coverage": "jest --coverage --maxWorkers=1",
+    "test": "jest --verbose --watchAll  -i --runInBand --silent",
+    "coverage": "jest --coverage --maxWorkers=1 --silent",
     "start": "node server.js"
   },
   "author": "",

@@ -10,7 +10,6 @@ module.exports = async (req, res, next) => {
     }
     next();
   } catch (err) {
-    console.log(err);
     res.status(500).json({ok: false, msg: 'error interno'})
   }
 };

@@ -1,16 +1,19 @@
 const request = require("supertest");
 const db = require("../../api/database/models");
+const { Data } = require("../../helpers/dataDB");
 const generateJWT = require("../../helpers/generateToken");
 const { app, server } = require("../../server");
-const { Data } = require("../../helpers/dataDB");
 
 afterEach(() => {
   server.close();
 });
 
-// beforeAll(async() => {
-//   await Data();
-// })
+
+beforeAll(async ()=> {
+  await Data()
+})
+
+
 
 afterAll(async () => {
   await db.sequelize.close();
@@ -757,6 +760,8 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
   });
  
   test("Debe retornar un obeto usuario", async () => {
+    
+    db.sequelize.query("USE `mi_ecommerce_test`;")
     const { id } = await db.User.findOne({
       where: { email: "supertest2@cenco.com" },
       attributes: ["id"],
@@ -773,8 +778,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
     expect(body.userDeleted).toEqual(
-      expect.objectContaining({ email: expect.any(String) })
-    );
+      expect.objectContaining({ email: expect.any(String) }))
   });
 
   test("Debe retornar un statusCode 404", async () => {
@@ -791,7 +795,7 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
 describe("Deben retornar statusCode 500", () => {
   test("Debe retornar un statusCode 500 error en la base de datos", async () => {
     const token = await generateJWT(payloadGod);
-    // await db.sequelize.query("drop database if exists mi_ecommerce_test;")
+    db.sequelize.query('drop database `mi_ecommerce_test`')
     db.sequelize.close();
     const { statusCode } = await request(app)
       .get("/api/v1/users")

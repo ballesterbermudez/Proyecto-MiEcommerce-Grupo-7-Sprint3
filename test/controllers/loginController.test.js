@@ -3,18 +3,18 @@ const db = require('../../api/database/models');
 const {app, server} = require('../../server');
 const { Data } = require("../../helpers/dataDB");
 
+
 afterEach(() => {
     server.close();
 });
+beforeAll(async ()=> {
+    await Data()
+  })
 
 afterAll(async () => {
-    // await db.sequelize.query("drop database if exists mi_ecommerce_test;")
+
     await db.sequelize.close();
 })
-
-// beforeAll(async() => {
-//     await Data();
-//   })
 
 describe("POST /login", () => {
     test("Login Status 200", async () => {
@@ -49,6 +49,7 @@ describe("POST /login", () => {
             username:'',
             password:''
         }
+          db.sequelize.query('drop database `mi_ecommerce_test`')
           await db.sequelize.close();
           const {statusCode}=await request(app).post('/api/v1/login/').send(body)
           expect(statusCode).toBe(500);

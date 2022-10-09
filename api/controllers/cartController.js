@@ -1,6 +1,7 @@
-const { sequelize } = require("../database/models");
+
 const persistance = require("../persistence/persistence");
 const { ValidationError } = require("sequelize");
+const db = require("../database/models");
 
 const deleteCart = async (id, transaction = null) => {
     const user = await persistance.getCartByUserID(id);
@@ -80,7 +81,11 @@ const cartController = {
             const cart = await persistance.getCartByUserID(req.params.id);
 
             if (cart) {
-                res.send(cart);
+                if(Object.keys(cart.cart).length === 0) {
+                    res.status(200).send('El carrito esta vacio');
+                } else {
+                    res.status(200).send(cart)
+                }
             } else {
                 res.status(404).json({
                     ok: false,
@@ -96,9 +101,11 @@ const cartController = {
         }
     },
     modifyCart: async (req, res) => {
-        let t = await sequelize.transaction();
+
+        let t = await db.sequelize.transaction();
 
         try {
+
             //borramos el antiguo cart
             let antiguoCart = await deleteCart(req.params.id, t);
 
@@ -113,7 +120,6 @@ const cartController = {
             res.status(200).json({ ok: true, newCart: cartById });
         } catch (error) {
             await t.rollback();
-            console.log(error);
             if (error instanceof ValidationError) {
                 let errorArray = [];
                 error.errors.forEach((el, i) => {

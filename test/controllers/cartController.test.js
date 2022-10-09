@@ -3,21 +3,34 @@ const db = require("../../api/database/models");
 const { app, server } = require("../../server");
 const gerateJWT = require("../../helpers/generateToken");
 const { Data } = require("../../helpers/dataDB");
+const Sequelize = require('sequelize');
+
+const env = process.env.NODE_ENV || 'development';
+const config = require('../../api/database/config/config')[env];
+
 
 afterEach(() => {
   server.close();
 });
+beforeAll(async ()=> {
+  await Data()
+  db.sequelize = {}
+  db.sequelize = new Sequelize('mi_ecommerce_test', config.username, config.password, config);
+ 
+})
+
+
+
 
 afterAll(async () => {
   await db.sequelize.close();
 });
 
-// beforeAll(async() => {
-//   await Data();
-// })
+
 
 describe("GET /api/v1/carts/:id", () => {
   test("debe devolver status 200", async () => {
+    
     const idUser = 1;
     const payload = {
       id: 1,
@@ -32,7 +45,7 @@ describe("GET /api/v1/carts/:id", () => {
   });
   test("debe devolver status 404 si el id no se corresponde con ningun user", async () => {
     const idUser = 9999;
-
+   
     const payload = {
       id: 1,
       username: "diegogod",
@@ -45,6 +58,7 @@ describe("GET /api/v1/carts/:id", () => {
     expect(statusCode).toBe(404);
   });
   test("debe devolver un objeto json si no encuentra usuario", async () => {
+    
     let id = 9999;
     const payload = {
       id: 1,
@@ -58,6 +72,8 @@ describe("GET /api/v1/carts/:id", () => {
     expect(body).toBeInstanceOf(Object);
   });
   test("debe devolver un objeto json si encuentra el usuario", async () => {
+    
+    
     const idUser = 3;
     const payload = {
       id: 1,
@@ -74,6 +90,10 @@ describe("GET /api/v1/carts/:id", () => {
 
 describe("PUT /api/v1/carts/:id", () => {
   test("debe devolver status 200 al modiificar un carrito correctamente", async () => {
+    
+    await db.sequelize.query('USE `mi_ecommerce_test`');
+   
+  
     const idUser = 1;
     const payload = {
       id: 1,
@@ -88,6 +108,7 @@ describe("PUT /api/v1/carts/:id", () => {
     expect(statusCode).toBe(200);
   });
   test("debe devolver status 404 al no encontrar un usuario", async () => {
+    
     const idUser = 99999;
     const payload = {
       id: 1,
@@ -102,6 +123,7 @@ describe("PUT /api/v1/carts/:id", () => {
     expect(statusCode).toBe(404);
   });
   test("debe devolver un json si no encuentra user", async () => {
+    
     const idUser = 99999;
     const payload = {
       id: 1,
@@ -117,6 +139,7 @@ describe("PUT /api/v1/carts/:id", () => {
   });
 
   test("debe devolver un json si encuentr user", async () => {
+    
     const idUser = 1;
     const payload = {
       id: 1,
@@ -131,6 +154,7 @@ describe("PUT /api/v1/carts/:id", () => {
     expect(body).toBeInstanceOf(Object);
   });
   test("debe crear carrito en un usuario", async () => {
+    
     const idUser = 1;
     const payload = {
       id: 1,
@@ -152,6 +176,7 @@ describe("PUT /api/v1/carts/:id", () => {
   });
 
   test("debe crear y borrar un elemento de un carrito", async () => {
+    
     const idUser = 1;
     const payload = {
       id: 1,
@@ -181,6 +206,7 @@ describe("PUT /api/v1/carts/:id", () => {
     expect(cartConUnaCosaMenos).toHaveLength(1);
   });
   test("debe crear e eliminar el carrito de un usuario", async () => {
+    
     const idUser = 1;
     const payload = {
       id: 1,
@@ -217,8 +243,9 @@ describe("PUT /api/v1/carts/:id", () => {
       username: "diegogod",
       role: "GOD",
     };
+    
     const jwt = await gerateJWT(payload);
-    const { body } = await request(app)
+    const { body ,status} = await request(app)
       .put("/api/v1/carts/" + idUser)
       .auth(jwt, { type: "bearer" })
       .send([
@@ -226,8 +253,8 @@ describe("PUT /api/v1/carts/:id", () => {
         { id_product: 3, quantity: 1 },
         { id_product: 4, quantity: 1 },
       ]);
-    console.log(body);
-    expect(body).toBeInstanceOf(Array);
+    
+    expect(body).toBeInstanceOf(Array)
 
     await request(app)
       .put("/api/v1/carts/" + idUser)
@@ -242,7 +269,8 @@ describe("PUT /api/v1/carts/:id", () => {
 
 describe("Prueba de status 500", () => {
   beforeAll(async () => {
-    // await db.sequelize.query("drop database if exists mi_ecommerce_test;")
+
+    db.sequelize.query('drop database `mi_ecommerce_test`')
     await db.sequelize.close();
   });
 
