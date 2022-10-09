@@ -88,23 +88,15 @@ const usersController = {
   createUser: async (req, res) => {
     try {
       const { role } = req.body;
-      //CHECK SI EXISTE UN USUARIO CON EL ID
-      // if (await persistance.searchById("User", req.body.id)) {
-      //   res.status(412).json({
-      //     ok: false,
-      //     msg: `El usuario con id ${req.body.id} ya existe`,
-      //   });
-      //   //CHECK SI EL ROLE EXISTE
-      // } else
+
+      //CHECK SI EL ROL INGRESADO EXISTE EN LA BASE
       if (!(await persistance.searchById("Role", req.body.id_role))) {
-        console.log(req.body.role);
         res.status(412).json({
           ok: false,
           msg: `El rol debe ser GUEST, ADMIN o GOD`,
         });
         //CHECK SI NO LLEGA NADA VACIO EN EL BODY
       } else if (
-        // req.body.id !== undefined &&
         req.body.email !== undefined &&
         req.body.username !== undefined &&
         req.body.password !== undefined &&
@@ -113,7 +105,6 @@ const usersController = {
       ) {
         //CREO UN USUARIO CON LOS DATOS DEL BODY
         const newUser = {
-          // id: req.body.id,
           email: req.body.email,
           username: req.body.username,
           password: req.body.password,
@@ -124,7 +115,7 @@ const usersController = {
           id_role: req.body.id_role,
         };
         //GUARDO EL USUARIO EN LA BASE DE DATOS
-        await persistance.inster("User", newUser)
+        await persistance.inster("User", newUser);
         //PASO EL USUARIO A USUARIO DT PARA RETORNAR SIN PASS
         const newUserDT = userConverter(newUser);
 
@@ -171,30 +162,38 @@ const usersController = {
           msg: `El rol debe ser GUEST, ADMIN o GOD`,
         });
       } else if (userToEdit) {
-        //CREO LA DATA PARA EDITAR CON EL BODY
-        const dataToEdit = {
-          email: req.body.email,
-          username: req.body.username,
-          password: req.body.password,
-          first_name: req.body.first_name,
-          last_name: req.body.last_name,
-          profilepic: req.body.profilepic,
-          id_role: req.body.id_role,
-        };
-        //ACTUALIZO LOS DATOS EN LA BASE DE DATOS
-        await persistance.updateData("User", req.params.userId, dataToEdit);
-        //TRAIGO EL USUARIO ACTUALIZADO
-        const userEdited = await persistance.searchById(
-          "User",
-          req.params.userId
-        );
-        //PASO USUARIO A USUARIODT PARA MOSTRARLO SIN PASS
-        const userEditedDT = userConverter(userEdited);
-        res.status(200).json({
-          ok: true,
-          msg: `Usuario ${userToEdit.username} editado con exito`,
-          user: userEditedDT,
-        });
+        //CHECQUEO QUE SI QUIERE CAMBIAR EL ROL SEA GOD
+        if (id_role !== undefined && userToEdit.id_role !== 1) {
+          res.status(401).json({
+            ok: false,
+            msg: `El rol solo puede cambiado por un usuario GOD`,
+          });
+        } else {
+          //CREO LA DATA PARA EDITAR CON EL BODY
+          const dataToEdit = {
+            email: req.body.email,
+            username: req.body.username,
+            password: req.body.password,
+            first_name: req.body.first_name,
+            last_name: req.body.last_name,
+            profilepic: req.body.profilepic,
+            id_role: req.body.id_role,
+          };
+          //ACTUALIZO LOS DATOS EN LA BASE DE DATOS
+          await persistance.updateData("User", req.params.userId, dataToEdit);
+          //TRAIGO EL USUARIO ACTUALIZADO
+          const userEdited = await persistance.searchById(
+            "User",
+            req.params.userId
+          );
+          //PASO USUARIO A USUARIODT PARA MOSTRARLO SIN PASS
+          const userEditedDT = userConverter(userEdited);
+          res.status(200).json({
+            ok: true,
+            msg: `Usuario ${userToEdit.username} editado con exito`,
+            user: userEditedDT,
+          });
+        }
       } else {
         res.status(404).json({
           ok: false,
