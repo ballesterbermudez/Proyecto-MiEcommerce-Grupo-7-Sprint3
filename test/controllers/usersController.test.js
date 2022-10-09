@@ -163,7 +163,6 @@ describe("POST - Crear un usuario en la base de datos - /users", () => {
       password: "123456",
       first_name: "El",
       last_name: "Tester",
-      profilepic: "https://sequelize.com/constraints/",
       id_role: 1,   
     };
     const token = await generateJWT(payloadGod);
@@ -764,6 +763,12 @@ describe("DELETE - Elimininar un usuario de la base de datos - /users/:userId", 
     });
     const userId = id;
     const token = await generateJWT(payloadGod);
+
+    await request(app)
+      .put("/api/v1/carts/" + userId)
+      .auth(token, { type: "bearer" })
+      .send({ id_product: 1, quantity: 2 });
+
     const { body } = await request(app)
       .delete(`/api/v1/users/${userId}`)
       .auth(token, { type: "bearer" });
